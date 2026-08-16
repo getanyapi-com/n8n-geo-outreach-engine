@@ -1,0 +1,10 @@
+{
+  "name": "n8n-geo-outreach-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "node verify.mjs",
+    "proof": "node proof/run-proof.mjs"
+  }
+}

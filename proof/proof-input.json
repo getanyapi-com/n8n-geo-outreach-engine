@@ -1,0 +1,15 @@
+{
+  "website": "https://getanyapi.com",
+  "brand": "AnyAPI",
+  "category": "scraping API",
+  "icp": "AI agents and developers",
+  "competitors": "Apify\nBright Data\nScraperAPI\nSerpApi",
+  "country": "US",
+  "sender_name": "Kevin Wang",
+  "sender_role": "Founder",
+  "results_email": "support@getanyapi.com",
+  "spend_ceiling_usd": 2,
+  "followup_gap_days": 5,
+  "max_followups": 1,
+  "blocked_domains": ""
+}

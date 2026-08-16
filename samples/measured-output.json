@@ -1,0 +1,334 @@
+{
+  "run": {
+    "workflow": "GEO Prospector (lite)",
+    "executed_by": "proof/run-proof.mjs, which runs the Code nodes out of the shipped workflow JSON",
+    "gmail_executed": false,
+    "run_id": "geo-proof-v6",
+    "started_at": "2026-08-16T02:29:33.599Z",
+    "harness_wall_seconds": 1381.213,
+    "anyapi_calls": 122,
+    "anyapi_cost_usd": 0.15542
+  },
+  "inputs": {
+    "website": "https://getanyapi.com",
+    "brand": "AnyAPI",
+    "category": "scraping API",
+    "competitors": [
+      "Apify",
+      "Bright Data",
+      "ScraperAPI",
+      "SerpApi"
+    ],
+    "spend_ceiling_usd": 2
+  },
+  "buyer_prompts": [
+    "best scraping API tools",
+    "top scraping API software 2026",
+    "best scraping API for AI agents and developers",
+    "alternatives to Apify",
+    "alternatives to Bright Data",
+    "alternatives to ScraperAPI",
+    "alternatives to SerpApi",
+    "Apify vs Bright Data"
+  ],
+  "funnel": {
+    "prompts_count": 8,
+    "engine_calls": 32,
+    "engine_calls_empty": 0,
+    "engine_calls_failed": 3,
+    "visibility_checks": 21,
+    "visibility_mentioned": 0,
+    "visibility_cited": 0,
+    "citations_harvested": 130,
+    "pages_considered": 130,
+    "pages_after_ownership_filter": 32,
+    "ownership_counts": {
+      "competitor": 63,
+      "third_party": 32,
+      "first_party_vendor": 18,
+      "platform": 17
+    },
+    "pages_scraped": 32,
+    "pages_rejected_not_roundup": 1,
+    "pages_already_listing_you": 0,
+    "contacts_from_page": 10,
+    "contacts_from_contact_page": 5,
+    "contacts_from_email_find": 0,
+    "contacts_none": 16,
+    "emails_rejected": 3,
+    "emails_verified": 12,
+    "drafts_passed_verify": 5,
+    "drafts_rejected_verify": 7,
+    "drafts_created_in_gmail": null
+  },
+  "costs": {
+    "anyapi_usd": 0.15542,
+    "spend_ceiling_usd": 2,
+    "by_node": {
+      "AnyAPI Scrape Your Website": 0.0005,
+      "AnyAPI Ask ChatGPT": 0.027,
+      "AnyAPI Ask Perplexity": 0.0315,
+      "AnyAPI Ask Gemini": 0.036,
+      "AnyAPI Ask Google AI Overview": 0.01082,
+      "AnyAPI Scrape The Page": 0.016,
+      "AnyAPI Scrape The Contact Page": 0.021,
+      "AnyAPI Verify The Email": 0.0126
+    }
+  },
+  "drafts": [
+    {
+      "page_url": "https://kadoa.com/blog/best-ai-web-scrapers-2026",
+      "publisher": "kadoa.com",
+      "page_title": "The Best AI Web Scrapers of 2026: An Honest Review · Kadoa",
+      "cited_pairs": 1,
+      "engines": [
+        "gemini"
+      ],
+      "prompts": [
+        "best scraping API for AI agents and developers"
+      ],
+      "recipient_domain": "kadoa.com",
+      "contact_source": "contact_page",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"The Best AI Web Scrapers of 2026: An Honest Review · Kadoa\"",
+      "quoted_snippet": "An AI web scraper relies on Large Language Models (LLMs) and multimodal analysis (text + vision) to identify data by its meaning, rather than its rigid HTML structure.",
+      "page_text_excerpt": " scrapers don't just write scripts for you; they fix them when they break. We're moving from brittle scripts to autonomous agents that rely on visual and semantic understanding rather than rigid selectors. This guide evaluates which AI web scraping tools actually solve the maintenance problem versus those that automate the script-writing process. ## What is an AI web scraper? (And what it is not) An AI web scraper relies on Large Language Models (LLMs) and multimodal analysis (text + vision) to identify data by its meaning, rather than its rigid HTML structure. - What it is – at its most advanced, it is a system where AI agents generate and continuously maintain deterministic scraping code. You define the intent (e.g., \"Extract prices\"), and the agent builds a robust extractor. It runs efficiently like a standard script but has the intelligence to self-heal by updating its own code if the website layout changes. - What it is not – a simple wrapper aroun"
+    },
+    {
+      "page_url": "https://tomba.io/blog/apify-alternatives",
+      "publisher": "tomba.io",
+      "page_title": "Top Apify Alternatives for Web Scraping & Data 2026 - Tomba Blog",
+      "cited_pairs": 1,
+      "engines": [
+        "chatgpt"
+      ],
+      "prompts": [
+        "alternatives to Apify"
+      ],
+      "recipient_domain": "tomba.io",
+      "contact_source": "contact_page",
+      "email_status": "good",
+      "subject": "AnyAPI for \"Top Apify Alternatives for Web Scraping & Data 2026\"",
+      "quoted_snippet": "Compare 9 Apify alternatives for web scraping, automation, and lead data — by pricing, ease of use, and scale.",
+      "page_text_excerpt": "es) - [Which Apify alternative should you choose?](#which-apify-alternative-should-you-choose) - [Frequently asked questions](#frequently-asked-questions) - [The bottom line](#the-bottom-line) 0 clapsEnjoyed it? Give a clap. [B2B Data and Intelligence](https://tomba.io/blog/category/b2b-data-intelligence) # 9 Best Apify Alternatives for Web Scraping in 2026 Apify is powerful but not for everyone. Compare 9 Apify alternatives for web scraping, automation, and lead data — by pricing, ease of use, and scale. Jun 14, 2026 9 min read 2,124 words ![9 Best Apify Alternatives for Web Scraping in 2026](https://blog-cdn.tomba.io/content/images/2026/06/apify-alternatives-hero.png) TL;DR Apify is powerful but not for everyone. Compare 9 Apify alternatives for web scraping, automation, and lead data — by pricing, ease of use, and scale. Table of Contents9 - [What is Apify and why look for alternatives?](#what-"
+    },
+    {
+      "page_url": "https://coreclaw.com/blog/api-for-web-scraping",
+      "publisher": "coreclaw.com",
+      "page_title": "API for Web Scraping: 7 Best Options Compared in 2026",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "top scraping API software 2026"
+      ],
+      "recipient_domain": "coreclaw.com",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"API for Web Scraping: 7 Best Options Compared in 2026\"",
+      "quoted_snippet": "Ready-made data platforms may go further by returning organized fields such as product names, prices, ratings, URLs, business names, reviews, or search results.",
+      "page_text_excerpt": " users request web data programmatically. Instead of opening a browser, copying information, and cleaning it manually, a user or application sends a request to an endpoint and receives a response. The response may be raw HTML, rendered page content, screenshots, structured JSON, or a cleaned dataset. Developer-focused APIs often handle proxies, JavaScript rendering, CAPTCHA handling, and retries. Ready-made data platforms may go further by returning organized fields such as product names, prices, ratings, URLs, business names, reviews, or search results. ## Why Teams Use Web Scraping APIs Teams use web scraping APIs when manual data collection becomes too slow or inconsistent. Ecommerce teams may monitor product prices. SEO teams may track search results. Sales teams may collect public business information. Data teams may feed public web data into internal dashboards, AI workflows, or research pipelines. A good API workflow should reduce repetiti"
+    },
+    {
+      "page_url": "https://searchcans.com/blog/serpapi-apify-bright-data-comparison",
+      "publisher": "searchcans.com",
+      "page_title": "Comparing SerpApi, Apify, and Bright Data for Web Scraping in 2026",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "Apify vs Bright Data"
+      ],
+      "recipient_domain": "searchcans.com",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"Comparing SerpApi, Apify, and Bright Data for Web Scraping in 2026\"",
+      "quoted_snippet": "SerpApi, Apify, and Bright Data represent three distinct philosophies in the web scraping and data extraction space, each with a core architectural focus that dictates its strengths and ideal use cases.",
+      "page_text_excerpt": "gerprinting, and CAPTCHA solving to deliver structured data. These APIs allow developers to programmatically access web data without managing the underlying infrastructure. Top-tier providers typically handle over 1 million requests per day for enterprise clients, ensuring reliability and scale for data-intensive operations. ## How Do SerpApi, Apify, and Bright Data Differ in Architectural Focus? SerpApi, Apify, and Bright Data represent three distinct philosophies in the web scraping and data extraction space, each with a core architectural focus that dictates its strengths and ideal use cases. As of April 2026, understanding these foundational differences is critical for selecting the right tool for your specific data needs, especially when dealing with complex extraction tasks or large-scale projects. Now, serpApi positions itself primarily as a SERP API provider. Its architecture is deeply optimized for fetching structured data directly from search engines like Google, Bing, and Duck"
+    },
+    {
+      "page_url": "https://sociavault.com/blog/brightdata-vs-apify-vs-sociavault",
+      "publisher": "sociavault.com",
+      "page_title": "Bright Data vs Apify vs SociaVault: Which Scraping API Is Right for You in 2026? | SociaVault Blog | SociaVault",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "Apify vs Bright Data"
+      ],
+      "recipient_domain": "sociavault.com",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"Bright Data vs Apify vs SociaVault: Which Scraping API Is Right for\"",
+      "quoted_snippet": "Best known for: Breadth of coverage (thousands of actors covering virtually every public website), open-source SDK, flexibility for custom builds.",
+      "page_text_excerpt": "rprise compliance, deep e-commerce coverage. Typical customer: Fortune 500 companies, hedge funds, big-data startups, anyone running scraping at the scale of millions of requests per day. ### Apify The scraper marketplace. Built around the concept of \"actors\" — individual scrapers built by third parties or by Apify itself, available in their store. You rent compute, run actors, and get back data. Best known for: Breadth of coverage (thousands of actors covering virtually every public website), open-source SDK, flexibility for custom builds. Typical customer: Mid-size companies and agencies who need varied data sources, developers comfortable with stitching scrapers together. ### SociaVault Purpose-built for social media. Single API covering Instagram, TikTok, YouTube, Facebook, Twitter/X, LinkedIn, Threads, Reddit, Pinterest, Snapchat — all the major social platforms — plus their respective ad libraries. Best known for: Deep social "
+    }
+  ],
+  "refusals": [
+    {
+      "page_url": "https://techradar.com/reviews/bright-data",
+      "publisher": "techradar.com",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://scrape.do/blog/bright-data-alternatives",
+      "publisher": "scrape.do",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://scrape.do/blog/serpapi-alternatives",
+      "publisher": "scrape.do",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://context.dev/blog/best-web-scraping-tools",
+      "publisher": "context.dev",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://context.dev/blog/best-web-crawling-apis-for-ai-agents-2026",
+      "publisher": "context.dev",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://context.dev/blog/top-10-web-scraping-apis-for-ai",
+      "publisher": "context.dev",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://nimbleway.com/blog/bright-data-alternatives",
+      "publisher": "nimbleway.com",
+      "status": "rejected_verify",
+      "reject_reason": "no clean sentence on the page names a vendor inside the quote bounds"
+    },
+    {
+      "page_url": "https://crustdata.com/blog/brightdata-alternatives",
+      "publisher": "crustdata.com",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said risky and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://designrush.com/agency/it-services/trends/web-scraping-api",
+      "publisher": "designrush.com",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said bad and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://stork.ai/blog/best-web-scraping-tools-for-ai-agents-2026",
+      "publisher": "stork.ai",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said risky and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://miniloop.ai/blog/apify-alternatives-2026",
+      "publisher": "miniloop.ai",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/docs/apify-vs-the-world/apify-vs-bright-data",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://fastcrw.com/blog/apify-alternatives",
+      "publisher": "fastcrw.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/docs/apify-vs-the-world/apify-alternatives",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://apiscout.dev/guides/tavily-vs-serpapi-vs-brave-search-api-2026",
+      "publisher": "apiscout.dev",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/bright-data-vs-apify-2026",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://fastcrw.com/blog/best-web-scraping-apis",
+      "publisher": "fastcrw.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://github.com/apify",
+      "publisher": "github.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://lobstr.io/blog/apify-alternative",
+      "publisher": "lobstr.io",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://scrap.io/best-apify-alternative-google-maps-scraping-tested-comparison",
+      "publisher": "scrap.io",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://scrapewise.ai/blogs/apify-vs-bright-data-vs-oxylabs-web-scraping-platform-2026",
+      "publisher": "scrapewise.ai",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://forum.seocontentmachine.com/t/serp-api-as-an-alternative-for-google-scraping/257",
+      "publisher": "seocontentmachine.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/apify-vs-bright-data-2026",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/bright-data-review",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/best-ai-web-scraper-2026",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://use-apify.com/docs/apify-vs-the-world",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://r.jina.ai/",
+      "publisher": "jina.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    }
+  ]
+}

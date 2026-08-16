@@ -1,0 +1,592 @@
+{
+  "name": "GEO Follow-Up Drafter",
+  "active": false,
+  "nodes": [
+    {
+      "id": "geo-000",
+      "name": "Every Morning",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "position": [
+        -2400,
+        0
+      ]
+    },
+    {
+      "id": "geo-001",
+      "name": "Read Your Config",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_DATA_TABLE_ID",
+          "cachedResultName": "geo_config"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "default"
+            }
+          ]
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "position": [
+        -600,
+        0
+      ]
+    },
+    {
+      "id": "geo-002",
+      "name": "Read Active Prospects",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_DATA_TABLE_ID",
+          "cachedResultName": "geo_prospects"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "sequence_state",
+              "keyValue": "active"
+            }
+          ]
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "position": [
+        -300,
+        0
+      ]
+    },
+    {
+      "id": "geo-003",
+      "name": "Choose Threads To Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const TIER = 'pro';\n\n// --- shared helpers (inlined by the builder into every Code node that needs them) ---\nconst MULTI_TLD = ['co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'co.nz', 'co.jp', 'co.kr', 'com.br', 'co.za', 'com.sg', 'co.in', 'com.mx', 'com.tr', 'co.il'];\n\nfunction hostOf(u) {\n  try { return new URL(String(u)).hostname.toLowerCase().replace(/^www\\./, ''); } catch (e) { return ''; }\n}\n\nfunction registrable(hostOrUrl) {\n  const raw = String(hostOrUrl || '');\n  const h = /^https?:\\/\\//i.test(raw) ? hostOf(raw) : raw.toLowerCase().replace(/^www\\./, '').split('/')[0];\n  const parts = h.split('.').filter(Boolean);\n  if (parts.length <= 2) return h;\n  const last2 = parts.slice(-2).join('.');\n  return MULTI_TLD.indexOf(last2) === -1 ? last2 : parts.slice(-3).join('.');\n}\n\nfunction normalizeUrl(u) {\n  try {\n    const url = new URL(String(u));\n    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';\n    url.hash = '';\n    url.hostname = url.hostname.toLowerCase().replace(/^www\\./, '');\n    const drop = [];\n    url.searchParams.forEach((_v, k) => { if (/^(utm_|fbclid|gclid|mc_|msclkid|igshid|ref$|source$)/i.test(k)) drop.push(k); });\n    drop.forEach((k) => url.searchParams.delete(k));\n    let s = url.toString().replace(/\\?$/, '');\n    if (url.pathname !== '/') s = s.replace(/\\/$/, '');\n    return s;\n  } catch (e) { return ''; }\n}\n\nfunction normWs(s) { return String(s === null || s === undefined ? '' : s).replace(/\\s+/g, ' ').trim(); }\n\nfunction slugName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }\n\nfunction canonical(v) {\n  if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);\n  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';\n  return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}';\n}\n\n// FNV-1a style 64-bit-ish hash rendered as 16 hex chars. Pure JS on purpose: n8n Code nodes\n// cannot require('crypto') unless the instance sets NODE_FUNCTION_ALLOW_BUILTIN, and a giveaway\n// workflow must not depend on an instance env var.\nfunction stableHash(value) {\n  const s = typeof value === 'string' ? value : canonical(value);\n  let h1 = 0x811c9dc5;\n  let h2 = 0x1000193;\n  for (let i = 0; i < s.length; i++) {\n    const c = s.charCodeAt(i);\n    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;\n    h2 = Math.imul(h2 + c, 2654435761) >>> 0;\n  }\n  return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');\n}\n\n// geo-<run_id>-<sku>-<bodyHash>. Computed here as a data field, never as an inline expression on\n// the HTTP node: an inline expression is re-evaluated on retry, a data field is not.\nfunction idemKey(runId, sku, body) { return 'geo-' + runId + '-' + sku + '-' + stableHash(body); }\n\nfunction safeAll(name) { try { return $(name).all(); } catch (e) { return []; } }\n\nfunction safeFirst(name) { const a = safeAll(name); return a.length ? a[0].json : null; }\n\n// Every AnyAPI call is sent with fullResponse + neverError, so the workflow can tell an empty\n// answer (200 found:false, charged) from a failure (>=400) instead of guessing from an error item.\nfunction httpStatus(item) { const j = item && item.json ? item.json : item; return Number(j && j.statusCode) || 0; }\nfunction httpBody(item) { const j = item && item.json ? item.json : item; return (j && j.body) || {}; }\nfunction httpOk(item) { const s = httpStatus(item); return s >= 200 && s < 300; }\nfunction httpCost(item) { return httpOk(item) ? Number(httpBody(item).costUsd || 0) : 0; }\nfunction httpFound(item) { const o = httpBody(item).output || {}; return o.found === true; }\nfunction httpData(item) { const o = httpBody(item).output || {}; return o.data || null; }\nfunction httpErrorCode(item) {\n  const b = httpBody(item);\n  const e = b && b.error;\n  if (e && typeof e === 'object') return String(e.code || e.message || 'error');\n  if (typeof b === 'string') return b.slice(0, 200);\n  return String((b && b.code) || httpStatus(item) || 'error');\n}\n\n// One pass a day over every prospect that still has an open sequence. Reading the thread answers\n// sent, replied and due at once, which is why there is no separate reply watcher: the Gmail\n// trigger cannot see your own sent mail anyway.\nconst config = $('Read Your Config').first().json;\nconst rows = $input.all().map((i) => i.json).filter((r) => r && r.prospect_id);\n\nconst open = rows.filter((r) => String(r.gmail_thread_id || '').trim() && String(r.sequence_state || '') === 'active');\n\nif (open.length === 0) return [{ json: { nothing: true, checked: 0 } }];\n\nreturn open.map((r) => ({\n  json: Object.assign({}, r, {\n    nothing: false,\n    max_followups: Number(config.max_followups || 0),\n    followup_gap_days: Number(config.followup_gap_days || 0),\n    sender_name: String(config.sender_name || ''),\n    sender_role: String(config.sender_role || ''),\n    brand: String(config.brand || ''),\n    brand_domain: String(config.brand_domain || ''),\n  }),\n}));\n"
+      },
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "geo-004",
+      "name": "Is There A Thread To Check?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-is-there-a-thread-to-check-",
+              "leftValue": "={{ $json.nothing === false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "id": "geo-005",
+      "name": "Read The Gmail Thread",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "thread",
+        "operation": "get",
+        "threadId": "={{ $json.gmail_thread_id }}",
+        "simple": true,
+        "options": {}
+      },
+      "retryOnFail": false,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "id": "geo-006",
+      "name": "Decide The Thread State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const TIER = 'pro';\n\n// --- shared helpers (inlined by the builder into every Code node that needs them) ---\nconst MULTI_TLD = ['co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'co.nz', 'co.jp', 'co.kr', 'com.br', 'co.za', 'com.sg', 'co.in', 'com.mx', 'com.tr', 'co.il'];\n\nfunction hostOf(u) {\n  try { return new URL(String(u)).hostname.toLowerCase().replace(/^www\\./, ''); } catch (e) { return ''; }\n}\n\nfunction registrable(hostOrUrl) {\n  const raw = String(hostOrUrl || '');\n  const h = /^https?:\\/\\//i.test(raw) ? hostOf(raw) : raw.toLowerCase().replace(/^www\\./, '').split('/')[0];\n  const parts = h.split('.').filter(Boolean);\n  if (parts.length <= 2) return h;\n  const last2 = parts.slice(-2).join('.');\n  return MULTI_TLD.indexOf(last2) === -1 ? last2 : parts.slice(-3).join('.');\n}\n\nfunction normalizeUrl(u) {\n  try {\n    const url = new URL(String(u));\n    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';\n    url.hash = '';\n    url.hostname = url.hostname.toLowerCase().replace(/^www\\./, '');\n    const drop = [];\n    url.searchParams.forEach((_v, k) => { if (/^(utm_|fbclid|gclid|mc_|msclkid|igshid|ref$|source$)/i.test(k)) drop.push(k); });\n    drop.forEach((k) => url.searchParams.delete(k));\n    let s = url.toString().replace(/\\?$/, '');\n    if (url.pathname !== '/') s = s.replace(/\\/$/, '');\n    return s;\n  } catch (e) { return ''; }\n}\n\nfunction normWs(s) { return String(s === null || s === undefined ? '' : s).replace(/\\s+/g, ' ').trim(); }\n\nfunction slugName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }\n\nfunction canonical(v) {\n  if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);\n  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';\n  return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}';\n}\n\n// FNV-1a style 64-bit-ish hash rendered as 16 hex chars. Pure JS on purpose: n8n Code nodes\n// cannot require('crypto') unless the instance sets NODE_FUNCTION_ALLOW_BUILTIN, and a giveaway\n// workflow must not depend on an instance env var.\nfunction stableHash(value) {\n  const s = typeof value === 'string' ? value : canonical(value);\n  let h1 = 0x811c9dc5;\n  let h2 = 0x1000193;\n  for (let i = 0; i < s.length; i++) {\n    const c = s.charCodeAt(i);\n    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;\n    h2 = Math.imul(h2 + c, 2654435761) >>> 0;\n  }\n  return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');\n}\n\n// geo-<run_id>-<sku>-<bodyHash>. Computed here as a data field, never as an inline expression on\n// the HTTP node: an inline expression is re-evaluated on retry, a data field is not.\nfunction idemKey(runId, sku, body) { return 'geo-' + runId + '-' + sku + '-' + stableHash(body); }\n\nfunction safeAll(name) { try { return $(name).all(); } catch (e) { return []; } }\n\nfunction safeFirst(name) { const a = safeAll(name); return a.length ? a[0].json : null; }\n\n// Every AnyAPI call is sent with fullResponse + neverError, so the workflow can tell an empty\n// answer (200 found:false, charged) from a failure (>=400) instead of guessing from an error item.\nfunction httpStatus(item) { const j = item && item.json ? item.json : item; return Number(j && j.statusCode) || 0; }\nfunction httpBody(item) { const j = item && item.json ? item.json : item; return (j && j.body) || {}; }\nfunction httpOk(item) { const s = httpStatus(item); return s >= 200 && s < 300; }\nfunction httpCost(item) { return httpOk(item) ? Number(httpBody(item).costUsd || 0) : 0; }\nfunction httpFound(item) { const o = httpBody(item).output || {}; return o.found === true; }\nfunction httpData(item) { const o = httpBody(item).output || {}; return o.data || null; }\nfunction httpErrorCode(item) {\n  const b = httpBody(item);\n  const e = b && b.error;\n  if (e && typeof e === 'object') return String(e.code || e.message || 'error');\n  if (typeof b === 'string') return b.slice(0, 200);\n  return String((b && b.code) || httpStatus(item) || 'error');\n}\n\n// The whole state machine, read off one thread.\n//\n// An unsent draft still sitting in the thread carries the DRAFT label, so \"you have not pressed\n// send yet\" and \"a follow-up is already waiting for you\" are the same check and neither one drafts\n// anything new. Once you press send, Gmail turns that draft into a message with the SENT label.\nconst prospects = $('Is There A Thread To Check?').all().map((i) => i.json);\n\nconst labelsOf = (message) => (message.labels || []).map((l) => String(l.id || '').toUpperCase());\nconst headerOf = (message, name) => String(message[name] || '');\n\nreturn $input.all().map((item, index) => {\n  const p = prospects[index];\n  if (!p) return { json: { skipped: true } };\n\n  const thread = item.json || {};\n  const messages = Array.isArray(thread.messages) ? thread.messages : [];\n  const decided = (state, extra) => ({ json: Object.assign({}, p, { thread_state: state, followup_due: state === 'due', messages_in_thread: messages.length }, extra || {}) });\n\n  if (messages.length === 0) return decided('unreadable', { reject_reason: 'the stored thread returned no messages' });\n\n  const hasDraft = messages.some((m) => labelsOf(m).indexOf('DRAFT') !== -1);\n  if (hasDraft) return decided('draft_waiting');\n\n  const sentMessages = messages.filter((m) => labelsOf(m).indexOf('SENT') !== -1);\n  if (sentMessages.length === 0) return decided('not_sent');\n\n  const inbound = messages.filter((m) => labelsOf(m).indexOf('SENT') === -1 && headerOf(m, 'From'));\n  if (inbound.length > 0) {\n    return decided('replied', {\n      status: 'replied',\n      sequence_state: 'inactive',\n      replied_at: new Date(Number(inbound[inbound.length - 1].internalDate || Date.now())).toISOString(),\n    });\n  }\n\n  const lastSent = sentMessages.reduce((max, m) => Math.max(max, Number(m.internalDate || 0)), 0);\n  const sentAt = lastSent ? new Date(lastSent).toISOString() : new Date().toISOString();\n  const drafted = Number(p.followups_drafted || 0);\n\n  if (drafted >= p.max_followups) {\n    return decided('sequence_complete', { status: 'sequence_complete', sequence_state: 'inactive', sent_detected_at: p.sent_detected_at || sentAt });\n  }\n\n  const gapMs = p.followup_gap_days * 86400000;\n  if (lastSent && Date.now() - lastSent < gapMs) {\n    return decided('waiting', { status: 'sent_by_human', sent_detected_at: p.sent_detected_at || sentAt, next_followup_at: new Date(lastSent + gapMs).toISOString() });\n  }\n\n  return decided('due', { status: 'sent_by_human', sent_detected_at: p.sent_detected_at || sentAt, last_sent_at: sentAt });\n});\n"
+      },
+      "position": [
+        900,
+        0
+      ]
+    },
+    {
+      "id": "geo-007",
+      "name": "Is A Follow-Up Due?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-is-a-follow-up-due-",
+              "leftValue": "={{ $json.followup_due === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "id": "geo-008",
+      "name": "Build The Follow-Up Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const TIER = 'pro';\n\n// --- shared helpers (inlined by the builder into every Code node that needs them) ---\nconst MULTI_TLD = ['co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'co.nz', 'co.jp', 'co.kr', 'com.br', 'co.za', 'com.sg', 'co.in', 'com.mx', 'com.tr', 'co.il'];\n\nfunction hostOf(u) {\n  try { return new URL(String(u)).hostname.toLowerCase().replace(/^www\\./, ''); } catch (e) { return ''; }\n}\n\nfunction registrable(hostOrUrl) {\n  const raw = String(hostOrUrl || '');\n  const h = /^https?:\\/\\//i.test(raw) ? hostOf(raw) : raw.toLowerCase().replace(/^www\\./, '').split('/')[0];\n  const parts = h.split('.').filter(Boolean);\n  if (parts.length <= 2) return h;\n  const last2 = parts.slice(-2).join('.');\n  return MULTI_TLD.indexOf(last2) === -1 ? last2 : parts.slice(-3).join('.');\n}\n\nfunction normalizeUrl(u) {\n  try {\n    const url = new URL(String(u));\n    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';\n    url.hash = '';\n    url.hostname = url.hostname.toLowerCase().replace(/^www\\./, '');\n    const drop = [];\n    url.searchParams.forEach((_v, k) => { if (/^(utm_|fbclid|gclid|mc_|msclkid|igshid|ref$|source$)/i.test(k)) drop.push(k); });\n    drop.forEach((k) => url.searchParams.delete(k));\n    let s = url.toString().replace(/\\?$/, '');\n    if (url.pathname !== '/') s = s.replace(/\\/$/, '');\n    return s;\n  } catch (e) { return ''; }\n}\n\nfunction normWs(s) { return String(s === null || s === undefined ? '' : s).replace(/\\s+/g, ' ').trim(); }\n\nfunction slugName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }\n\nfunction canonical(v) {\n  if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);\n  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';\n  return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}';\n}\n\n// FNV-1a style 64-bit-ish hash rendered as 16 hex chars. Pure JS on purpose: n8n Code nodes\n// cannot require('crypto') unless the instance sets NODE_FUNCTION_ALLOW_BUILTIN, and a giveaway\n// workflow must not depend on an instance env var.\nfunction stableHash(value) {\n  const s = typeof value === 'string' ? value : canonical(value);\n  let h1 = 0x811c9dc5;\n  let h2 = 0x1000193;\n  for (let i = 0; i < s.length; i++) {\n    const c = s.charCodeAt(i);\n    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;\n    h2 = Math.imul(h2 + c, 2654435761) >>> 0;\n  }\n  return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');\n}\n\n// geo-<run_id>-<sku>-<bodyHash>. Computed here as a data field, never as an inline expression on\n// the HTTP node: an inline expression is re-evaluated on retry, a data field is not.\nfunction idemKey(runId, sku, body) { return 'geo-' + runId + '-' + sku + '-' + stableHash(body); }\n\nfunction safeAll(name) { try { return $(name).all(); } catch (e) { return []; } }\n\nfunction safeFirst(name) { const a = safeAll(name); return a.length ? a[0].json : null; }\n\n// Every AnyAPI call is sent with fullResponse + neverError, so the workflow can tell an empty\n// answer (200 found:false, charged) from a failure (>=400) instead of guessing from an error item.\nfunction httpStatus(item) { const j = item && item.json ? item.json : item; return Number(j && j.statusCode) || 0; }\nfunction httpBody(item) { const j = item && item.json ? item.json : item; return (j && j.body) || {}; }\nfunction httpOk(item) { const s = httpStatus(item); return s >= 200 && s < 300; }\nfunction httpCost(item) { return httpOk(item) ? Number(httpBody(item).costUsd || 0) : 0; }\nfunction httpFound(item) { const o = httpBody(item).output || {}; return o.found === true; }\nfunction httpData(item) { const o = httpBody(item).output || {}; return o.data || null; }\nfunction httpErrorCode(item) {\n  const b = httpBody(item);\n  const e = b && b.error;\n  if (e && typeof e === 'object') return String(e.code || e.message || 'error');\n  if (typeof b === 'string') return b.slice(0, 200);\n  return String((b && b.code) || httpStatus(item) || 'error');\n}\n\n// A follow-up is allowed to reference the first email, because that email really was sent. It is\n// not allowed to invent anything else, so it quotes the same line off the same page and adds one\n// sentence.\nreturn $input.all().map((item) => {\n  const p = item.json;\n  const greeting = p.author_first ? 'Hi ' + p.author_first + ',' : 'Hi there,';\n  const days = Math.max(1, Math.round((Date.now() - new Date(p.last_sent_at || p.sent_detected_at || Date.now()).getTime()) / 86400000));\n\n  const body = [\n    greeting,\n    '',\n    'I wrote ' + days + ' day' + (days === 1 ? '' : 's') + ' ago about your ' + p.page_title + ' page, and I know inbound pitches are easy to miss.',\n    '',\n    'Short version: this line on your page is what made me write,',\n    '',\n    '\"' + p.quoted_snippet + '\"',\n    '',\n    'and ' + p.brand + ' fits the same slot. Happy to send access or a written summary if it is useful, and equally happy to hear no.',\n    '',\n    p.sender_name,\n    p.sender_role + ', ' + p.brand,\n    'https://' + p.brand_domain,\n  ].join('\\n');\n\n  return {\n    json: Object.assign({}, p, {\n      // Same subject as the first email. Gmail needs the matching subject as well as the thread id\n      // to group the draft into the conversation.\n      followup_subject: p.subject,\n      followup_body: body,\n      followups_drafted_next: Number(p.followups_drafted || 0) + 1,\n    }),\n  };\n});\n"
+      },
+      "position": [
+        1500,
+        -340
+      ]
+    },
+    {
+      "id": "geo-009",
+      "name": "Draft The Follow-Up In Your Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "draft",
+        "operation": "create",
+        "subject": "={{ $json.followup_subject }}",
+        "emailType": "text",
+        "message": "={{ $json.followup_body }}",
+        "options": {
+          "sendTo": "={{ $json.contact_email }}",
+          "threadId": "={{ $json.gmail_thread_id }}"
+        }
+      },
+      "retryOnFail": false,
+      "position": [
+        1800,
+        -340
+      ]
+    },
+    {
+      "id": "geo-010",
+      "name": "Record The Follow-Up Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const TIER = 'pro';\n\n// --- shared helpers (inlined by the builder into every Code node that needs them) ---\nconst MULTI_TLD = ['co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'com.au', 'net.au', 'org.au', 'co.nz', 'co.jp', 'co.kr', 'com.br', 'co.za', 'com.sg', 'co.in', 'com.mx', 'com.tr', 'co.il'];\n\nfunction hostOf(u) {\n  try { return new URL(String(u)).hostname.toLowerCase().replace(/^www\\./, ''); } catch (e) { return ''; }\n}\n\nfunction registrable(hostOrUrl) {\n  const raw = String(hostOrUrl || '');\n  const h = /^https?:\\/\\//i.test(raw) ? hostOf(raw) : raw.toLowerCase().replace(/^www\\./, '').split('/')[0];\n  const parts = h.split('.').filter(Boolean);\n  if (parts.length <= 2) return h;\n  const last2 = parts.slice(-2).join('.');\n  return MULTI_TLD.indexOf(last2) === -1 ? last2 : parts.slice(-3).join('.');\n}\n\nfunction normalizeUrl(u) {\n  try {\n    const url = new URL(String(u));\n    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';\n    url.hash = '';\n    url.hostname = url.hostname.toLowerCase().replace(/^www\\./, '');\n    const drop = [];\n    url.searchParams.forEach((_v, k) => { if (/^(utm_|fbclid|gclid|mc_|msclkid|igshid|ref$|source$)/i.test(k)) drop.push(k); });\n    drop.forEach((k) => url.searchParams.delete(k));\n    let s = url.toString().replace(/\\?$/, '');\n    if (url.pathname !== '/') s = s.replace(/\\/$/, '');\n    return s;\n  } catch (e) { return ''; }\n}\n\nfunction normWs(s) { return String(s === null || s === undefined ? '' : s).replace(/\\s+/g, ' ').trim(); }\n\nfunction slugName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }\n\nfunction canonical(v) {\n  if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);\n  if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';\n  return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonical(v[k])).join(',') + '}';\n}\n\n// FNV-1a style 64-bit-ish hash rendered as 16 hex chars. Pure JS on purpose: n8n Code nodes\n// cannot require('crypto') unless the instance sets NODE_FUNCTION_ALLOW_BUILTIN, and a giveaway\n// workflow must not depend on an instance env var.\nfunction stableHash(value) {\n  const s = typeof value === 'string' ? value : canonical(value);\n  let h1 = 0x811c9dc5;\n  let h2 = 0x1000193;\n  for (let i = 0; i < s.length; i++) {\n    const c = s.charCodeAt(i);\n    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;\n    h2 = Math.imul(h2 + c, 2654435761) >>> 0;\n  }\n  return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');\n}\n\n// geo-<run_id>-<sku>-<bodyHash>. Computed here as a data field, never as an inline expression on\n// the HTTP node: an inline expression is re-evaluated on retry, a data field is not.\nfunction idemKey(runId, sku, body) { return 'geo-' + runId + '-' + sku + '-' + stableHash(body); }\n\nfunction safeAll(name) { try { return $(name).all(); } catch (e) { return []; } }\n\nfunction safeFirst(name) { const a = safeAll(name); return a.length ? a[0].json : null; }\n\n// Every AnyAPI call is sent with fullResponse + neverError, so the workflow can tell an empty\n// answer (200 found:false, charged) from a failure (>=400) instead of guessing from an error item.\nfunction httpStatus(item) { const j = item && item.json ? item.json : item; return Number(j && j.statusCode) || 0; }\nfunction httpBody(item) { const j = item && item.json ? item.json : item; return (j && j.body) || {}; }\nfunction httpOk(item) { const s = httpStatus(item); return s >= 200 && s < 300; }\nfunction httpCost(item) { return httpOk(item) ? Number(httpBody(item).costUsd || 0) : 0; }\nfunction httpFound(item) { const o = httpBody(item).output || {}; return o.found === true; }\nfunction httpData(item) { const o = httpBody(item).output || {}; return o.data || null; }\nfunction httpErrorCode(item) {\n  const b = httpBody(item);\n  const e = b && b.error;\n  if (e && typeof e === 'object') return String(e.code || e.message || 'error');\n  if (typeof b === 'string') return b.slice(0, 200);\n  return String((b && b.code) || httpStatus(item) || 'error');\n}\n\nconst prospects = $('Build The Follow-Up Draft').all().map((i) => i.json);\n\nreturn $input.all().map((item, index) => {\n  const p = prospects[index];\n  if (!p) return { json: { skipped: true } };\n  const res = item.json || {};\n  const message = res.message || {};\n  return {\n    json: Object.assign({}, p, {\n      status: 'followup_drafted',\n      sequence_state: 'active',\n      draft_id: String(res.id || p.draft_id || ''),\n      gmail_thread_id: String(message.threadId || p.gmail_thread_id || ''),\n      followups_drafted: p.followups_drafted_next,\n      draft_created_at: new Date().toISOString(),\n    }),\n  };\n});\n"
+      },
+      "position": [
+        2100,
+        -340
+      ]
+    },
+    {
+      "id": "geo-011",
+      "name": "Merge Follow-Up Outcomes",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 2,
+        "options": {}
+      },
+      "position": [
+        2400,
+        0
+      ]
+    },
+    {
+      "id": "geo-012",
+      "name": "Update Prospect Sequence State",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_DATA_TABLE_ID",
+          "cachedResultName": "geo_prospects"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "prospect_id",
+              "keyValue": "={{ $json.prospect_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "prospect_id": "={{ $json.prospect_id }}",
+            "status": "={{ $json.status }}",
+            "sequence_state": "={{ $json.sequence_state || \"active\" }}",
+            "draft_id": "={{ $json.draft_id || \"\" }}",
+            "gmail_thread_id": "={{ $json.gmail_thread_id }}",
+            "sent_detected_at": "={{ $json.sent_detected_at || null }}",
+            "replied_at": "={{ $json.replied_at || null }}",
+            "followups_drafted": "={{ Number($json.followups_drafted || 0) }}",
+            "draft_created_at": "={{ $json.draft_created_at || null }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "prospect_id",
+              "displayName": "prospect_id",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sequence_state",
+              "displayName": "sequence_state",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_id",
+              "displayName": "draft_id",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gmail_thread_id",
+              "displayName": "gmail_thread_id",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sent_detected_at",
+              "displayName": "sent_detected_at",
+              "type": "date",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "replied_at",
+              "displayName": "replied_at",
+              "type": "date",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followups_drafted",
+              "displayName": "followups_drafted",
+              "type": "number",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_created_at",
+              "displayName": "draft_created_at",
+              "type": "date",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "type": "date",
+              "display": true,
+              "required": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "matchingColumns": [
+            "prospect_id"
+          ]
+        },
+        "options": {}
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "position": [
+        2700,
+        0
+      ]
+    },
+    {
+      "id": "geo-013",
+      "name": "Nothing To Draft Today",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "parameters": {},
+      "position": [
+        -900,
+        510
+      ]
+    },
+    {
+      "id": "geo-014",
+      "name": "Sticky Note 15",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -740
+      ],
+      "parameters": {
+        "content": "## One daily pass answers sent, replied and due\nThere is no reply watcher and no sender in this package. `thread:get` returns every message in the thread, so one read tells you whether you pressed send, whether somebody wrote back, and whether a follow-up is due.\n\nA Gmail trigger cannot do this job: above typeVersion 1.2 it discards messages carrying the SENT label unless they also carry INBOX, so it cannot see you sending.\n\nAn unsent draft still sitting in the thread carries the DRAFT label, so \"you have not sent yet\" and \"a follow-up is already waiting\" are the same check, and neither one drafts anything new.",
+        "color": 6,
+        "width": 3940,
+        "height": 1460
+      }
+    }
+  ],
+  "connections": {
+    "Every Morning": {
+      "main": [
+        [
+          {
+            "node": "Read Your Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Your Config": {
+      "main": [
+        [
+          {
+            "node": "Read Active Prospects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Active Prospects": {
+      "main": [
+        [
+          {
+            "node": "Choose Threads To Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose Threads To Check": {
+      "main": [
+        [
+          {
+            "node": "Is There A Thread To Check?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is There A Thread To Check?": {
+      "main": [
+        [
+          {
+            "node": "Read The Gmail Thread",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nothing To Draft Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read The Gmail Thread": {
+      "main": [
+        [
+          {
+            "node": "Decide The Thread State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide The Thread State": {
+      "main": [
+        [
+          {
+            "node": "Is A Follow-Up Due?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is A Follow-Up Due?": {
+      "main": [
+        [
+          {
+            "node": "Build The Follow-Up Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Follow-Up Outcomes",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Build The Follow-Up Draft": {
+      "main": [
+        [
+          {
+            "node": "Draft The Follow-Up In Your Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft The Follow-Up In Your Gmail": {
+      "main": [
+        [
+          {
+            "node": "Record The Follow-Up Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record The Follow-Up Draft": {
+      "main": [
+        [
+          {
+            "node": "Merge Follow-Up Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Follow-Up Outcomes": {
+      "main": [
+        [
+          {
+            "node": "Update Prospect Sequence State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
