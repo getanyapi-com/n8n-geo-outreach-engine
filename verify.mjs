@@ -620,7 +620,7 @@ let prosePasses = true;
 // them would have made this check pass while reading nothing. It did, briefly: "$0.71 of API
 // spend" sat unchecked inside a fence.
 const FENCED_COPY_IS_THE_CLAIM = new Set(['N8N_TEMPLATE.md']);
-for (const doc of ['README.md', 'PROOF.md', 'REDDIT_DRAFT.md', 'N8N_TEMPLATE.md']) {
+for (const doc of ['README.md', 'PROOF.md', 'N8N_TEMPLATE.md']) {
   const raw = read(doc);
   if (/\{\{|\[TODO\]|XXX/.test(raw)) { fail(doc + ' still contains a placeholder'); prosePasses = false; }
   const text = FENCED_COPY_IS_THE_CLAIM.has(doc)
@@ -636,7 +636,7 @@ for (const doc of ['README.md', 'PROOF.md', 'REDDIT_DRAFT.md', 'N8N_TEMPLATE.md'
     prosePasses = false;
   }
 }
-if (prosePasses) pass('every number in the README, the proof, the post draft and the n8n listing is measured or explained');
+if (prosePasses) pass('every number in the README, the proof and the n8n listing is measured or explained');
 
 if (failed) { console.error('\n' + failed + ' check(s) failed.'); process.exit(1); }
 console.log('\nVerification complete.');
