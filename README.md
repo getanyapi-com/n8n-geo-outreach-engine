@@ -9,8 +9,6 @@ which is one key and one wallet across all of it, billed per request in real dol
 
 **The workflow never sends anything.** It writes Gmail drafts. You press send.
 
-![The band that writes the pitch and refuses to send it](screenshots/geo-outreach-n8n-canvas.png)
-
 ## Why this and not keyword rankings
 
 When someone asks an assistant for the best tool in your category, it does not read your website and
@@ -80,11 +78,6 @@ category. Emailing those is not neutral: it is asking a competitor to list you, 
 outcome than never finding the page at all.
 
 The workbook lists all 104 pages, with the outcome and the reason for every refusal.
-
-![The prospect workbook the run produced](screenshots/geo-outreach-prospect-workbook.png)
-
-Recipient addresses are masked in that screenshot. They are not masked in the workbook the workflow
-writes for you.
 
 Here is one of the seventeen drafts, exactly as the workflow composed it:
 
