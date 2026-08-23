@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "verify": "node verify.mjs",
-    "proof": "node proof/run-proof.mjs"
-  }
+    "proof": "node proof/run-proof-pro.mjs"
+  },
+  "description": "Find the pages AI answer engines cite for your category, prove they are pitchable, and draft the outreach in Gmail.",
+  "license": "MIT"
 }

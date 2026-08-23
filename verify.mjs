@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks the package before anyone imports it: the exports are sanitised, the graph is whole, the
 // safety invariants that make this thing publishable are actually in the JSON, and every number in
-// the README and PROOF.md traces back to samples/measured-output.json.
+// the README and PROOF.md traces back to samples/measured-output-pro.json.
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -17,11 +17,15 @@ const pass = (m) => console.log('PASS: ' + m);
 
 const FILES = [
   'geo-outreach-prospector.workflow.json',
-  'geo-outreach-prospector-lite.workflow.json',
   'geo-outreach-followup.workflow.json',
 ];
 const workflows = FILES.map((f) => ({ file: f, wf: parse(f) }));
-const sample = parse('samples', 'measured-output.json');
+// One prospector, one measured run. The lite tier is gone: the publisher filter that keeps this
+// package from emailing your competitors is a model step, so a tier without a model was a tier
+// that pitched rivals.
+const samples = [
+  { tier: 'pro', sample: parse('samples', 'measured-output-pro.json') },
+];
 
 // ---------------------------------------------------------------- 1. sanitised exports
 const SECRET_PATTERNS = [
@@ -171,37 +175,332 @@ for (const { file, wf } of workflows) {
 }
 if (guarded) pass('every paid call carries an Idempotency-Key data field, a real timeout, and a readable status code');
 
+// ------------------------------------------- 4b. the run record counts every paid node, by name
+// The reported spend sits next to the operator's ceiling, so a node missing from that list is money
+// spent and not shown. Measured on run 5, before the fix: $0.3623 reported against $0.4624 charged,
+// because pages dropped as "not a roundup" were scraped and charged but carried no surviving row.
+// This check exists because the failure is silent - the arithmetic is right, the input is short.
+{
+  let counted = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const record = wf.nodes.find((n) => n.name === 'Build Run Record');
+    if (!record) continue;
+    const paid = wf.nodes.filter((n) => n.name.startsWith('AnyAPI ')).map((n) => n.name);
+    const missing = paid.filter((name) => !record.parameters.jsCode.includes("'" + name + "'"));
+    if (missing.length) {
+      fail(file + ' / Build Run Record does not count ' + missing.join(', '));
+      counted = false;
+    }
+  }
+  if (counted) pass('the run record adds up every AnyAPI node in the workflow, so reported spend cannot undercount');
+}
+
 // ---------------------------------------------------------------- 5. the measured drafts quote the page
 let quoted = true;
-if (!sample.drafts.length) fail('the measured run produced no draft to check');
-for (const draft of sample.drafts) {
-  const haystack = draft.page_text_excerpt.replace(/\s+/g, ' ');
-  const needle = draft.quoted_snippet.replace(/\s+/g, ' ');
-  if (!needle || haystack.indexOf(needle) === -1) {
-    fail('a measured draft quotes something that is not in the recorded page text: ' + draft.page_url);
-    quoted = false;
-  }
-  if (draft.recipient_domain !== draft.publisher) {
-    fail('a measured draft is addressed off the page domain: ' + draft.page_url);
-    quoted = false;
+let draftCount = 0;
+for (const { tier, sample } of samples) {
+  if (!sample.drafts.length) fail('the measured ' + tier + ' run produced no draft to check');
+  draftCount += sample.drafts.length;
+  for (const draft of sample.drafts) {
+    const haystack = draft.page_text_excerpt.replace(/\s+/g, ' ');
+    const needle = draft.quoted_snippet.replace(/\s+/g, ' ');
+    if (!needle || haystack.indexOf(needle) === -1) {
+      fail('a measured ' + tier + ' draft quotes something that is not in the recorded page text: ' + draft.page_url);
+      quoted = false;
+    }
+    if (draft.recipient_domain !== draft.publisher) {
+      fail('a measured ' + tier + ' draft is addressed off the page domain: ' + draft.page_url);
+      quoted = false;
+    }
   }
 }
-if (quoted) pass(sample.drafts.length + ' measured draft(s) quote text that is literally in the recorded page');
+if (quoted) pass(draftCount + ' measured draft(s) quote text that is literally in the recorded page');
 
 // ---------------------------------------------------------------- 6. the funnel reconciles
-const f = sample.funnel;
-const checks = [
-  [f.engine_calls === f.prompts_count * 4, 'engine calls equal prompts times four engines'],
-  [f.drafts_passed_verify + f.drafts_rejected_verify <= f.emails_verified + f.emails_rejected + f.contacts_none, 'pitch outcomes cannot exceed the contacts that reached them'],
-  [f.pages_after_ownership_filter <= f.pages_considered, 'pitchable pages cannot exceed pages considered'],
-  [f.visibility_cited <= f.visibility_checks, 'citations of you cannot exceed visibility checks'],
-  [sample.costs.anyapi_usd <= sample.costs.spend_ceiling_usd, 'measured cost is inside the submitted ceiling'],
-];
 let reconciled = true;
-checks.forEach(([ok, label]) => { if (!ok) { fail('funnel does not reconcile: ' + label); reconciled = false; } });
+for (const { tier, sample } of samples) {
+  const f = sample.funnel;
+  const checks = [
+    [f.engine_calls === f.prompts_count * 3, 'engine calls equal prompts times three engines'],
+    [f.drafts_passed_verify + f.drafts_rejected_verify <= f.emails_verified + f.emails_rejected + f.contacts_none, 'pitch outcomes cannot exceed the contacts that reached them'],
+    [f.pages_after_ownership_filter <= f.pages_considered, 'pitchable pages cannot exceed pages considered'],
+    [f.visibility_cited <= f.visibility_checks, 'citations of you cannot exceed visibility checks'],
+    [sample.costs.anyapi_usd <= sample.costs.spend_ceiling_usd, 'measured cost is inside the submitted ceiling'],
+  ];
+  checks.forEach(([ok, label]) => { if (!ok) { fail(tier + ' funnel does not reconcile: ' + label); reconciled = false; } });
+}
 if (reconciled) pass('the measured funnel reconciles');
 
-// ---------------------------------------------------------------- 7. no unexplained number in the prose
+// ------------------------------------------------- 7. the pitch gate refuses a bare foreign domain
+// Executed, not grepped. The gate's own jsCode is run out of each shipped workflow against a draft
+// that is clean except for naming somebody else's domain without a scheme. A model wrote exactly
+// that ("AnyAPI (anyapi.com)") in the first pro run and the gate passed it, because check 4 only
+// matched https?:// links.
+// The fixture is shaped like what Compose The Pitch now emits: the quote is carried on the record
+// as proof of reading and is not printed, the page is named by title, and the offer back is a
+// verbatim line the composer placed from the form.
+const gateFixture = (extraSentence, { reciprocity = '', reciprocityLine = '', vendorMentioned = 'Apify', vendorsOnPage = [] } = {}) => {
+  const quote = 'Apify is the fastest way to get structured data out of a page.';
+  const context = 'Roundup of scraping tools. ' + quote + ' We rank them below for teams.';
+  const title = 'The best scraping tools';
+  const body = 'Hi there,\n\n'
+    + "I'm Kevin Wang from AnyAPI, one key and one wallet across hundreds of scraping and data APIs.\n\n"
+    + 'I came across your piece "' + title + '" and thought AnyAPI could be a relevant addition for '
+    + 'your readers - you already cover Apify there, and we do the same job without a subscription. '
+    + extraSentence
+    + (reciprocityLine ? '\n\n' + reciprocityLine : '')
+    + '\n\nWould this be something you would be open to?\n\n'
+    + 'Best,\nKevin Wang\nFounder @ AnyAPI\nhttps://getanyapi.com';
+  return {
+    json: {
+      pitch: {
+        subject: 'AnyAPI for your scraping tools roundup',
+        body,
+        quotedSnippet: quote,
+        vendorMentioned,
+        pageTitleShort: title,
+        reciprocityLine,
+      },
+      pitch_context: context,
+      page_url: 'https://publisher.example/best-scraping-tools',
+      page_domain: 'publisher.example',
+      page_title: title,
+      brand_domain: 'getanyapi.com',
+      contact_email: 'editor@publisher.example',
+      author_first: '',
+      vendors_on_page: vendorsOnPage,
+      reciprocity,
+    },
+  };
+};
+
+let gateHolds = true;
+for (const { file, wf } of workflows) {
+  const node = wf.nodes.find((n) => n.name === 'Verify The Pitch Quotes The Page');
+  if (!node) continue;
+  const stubs = {
+    'Name Every Brand In The Answers': { brands_named: ['Apify', 'Bright Data'] },
+    'Confirm Your Business Profile': { aliases: ['AnyAPI'] },
+  };
+  const $ = (ref) => ({ first: () => ({ json: stubs[ref] }), all: () => [{ json: stubs[ref] }] });
+  const run = (item) => {
+    const fn = new Function('$input', '$', node.parameters.jsCode);
+    return fn({ all: () => [item], first: () => item }, $)[0].json;
+  };
+
+  const clean = run(gateFixture('It fits alongside the tools you already list.'));
+  if (clean.draft_ready !== true) {
+    fail(file + ' / the pitch gate rejects a clean draft: ' + JSON.stringify(clean.verify_failures));
+    gateHolds = false;
+  }
+  const stray = run(gateFixture('You can see it at anyapi.com.'));
+  if (stray.draft_ready !== false || !/domain that is neither/.test(stray.reject_reason || '')) {
+    fail(file + ' / the pitch gate passed a draft naming a foreign bare domain: ' + JSON.stringify(stray.reject_reason));
+    gateHolds = false;
+  }
+
+  // The offer back is the only promise this package makes to a stranger under the operator's name,
+  // so it is checked in both directions: the configured one has to arrive verbatim, and an offer
+  // nobody configured has to be refused.
+  const offerLine = "In return, I'd be happy to link your piece from our own writing when it fits.";
+  const offered = run(gateFixture('', { reciprocity: 'link your piece from our own writing when it fits', reciprocityLine: offerLine }));
+  if (offered.draft_ready !== true) {
+    fail(file + ' / the pitch gate rejects a draft carrying the configured offer: ' + JSON.stringify(offered.verify_failures));
+    gateHolds = false;
+  }
+  const uninvited = run(gateFixture('In return, we would be happy to feature you on our site.'));
+  if (uninvited.draft_ready !== false || !/nothing was configured/.test(uninvited.reject_reason || '')) {
+    fail(file + ' / the pitch gate passed a draft offering something nobody configured: ' + JSON.stringify(uninvited.reject_reason));
+    gateHolds = false;
+  }
+
+  // "On the page" has to mean the whole page. The excerpt the writer sees is 6000 characters; the
+  // vendor list handed to it in the same prompt is matched against the entire markdown. Checking the
+  // vendor against the excerpt alone threw away 10 of 17 pitches in one run, every one naming a
+  // vendor that was genuinely on its page, just further down it.
+  const deepVendor = run(gateFixture('', { vendorMentioned: 'Bright Data', vendorsOnPage: ['Bright Data'] }));
+  if (deepVendor.draft_ready !== true) {
+    fail(file + ' / the pitch gate rejects a vendor proven on the page but below the excerpt: ' + JSON.stringify(deepVendor.verify_failures));
+    gateHolds = false;
+  }
+  const absentVendor = run(gateFixture('', { vendorMentioned: 'Bright Data', vendorsOnPage: [] }));
+  if (absentVendor.draft_ready !== false || !/vendor named is not on the page/.test(absentVendor.reject_reason || '')) {
+    fail(file + ' / the pitch gate passed a vendor that is on neither the page nor the excerpt: ' + JSON.stringify(absentVendor.reject_reason));
+    gateHolds = false;
+  }
+}
+if (gateHolds) pass('the pitch gate passes a clean draft, refuses a foreign bare domain, and refuses an offer nobody configured');
+
+// -------------------------------------------------- 7c. one person is written to once per run
+// Executed against the shipped Build Pitch Context. Measured before this existed: 16 drafts, 7 to
+// one publisher and 4 of those to the same editor in the same batch.
+{
+  let onePer = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const node = wf.nodes.find((n) => n.name === 'Build Pitch Context');
+    if (!node) continue;
+    const stubs = { 'Confirm Your Business Profile': { brand: 'AnyAPI', brand_domain: 'getanyapi.com' } };
+    const $ = (ref) => ({ first: () => ({ json: stubs[ref] }), all: () => [{ json: stubs[ref] }] });
+    const items = [
+      { json: { page_url: 'https://a.example/low', contact_email: 'ed@a.example', status: 'email_verified', score: 5, markdown: 'text' } },
+      { json: { page_url: 'https://a.example/high', contact_email: 'ed@a.example', status: 'email_verified', score: 9, markdown: 'text' } },
+      // Same human, shouted. Address comparison has to be case-insensitive or this one slips through.
+      { json: { page_url: 'https://a.example/caps', contact_email: 'ED@A.EXAMPLE', status: 'email_verified', score: 1, markdown: 'text' } },
+      { json: { page_url: 'https://b.example/only', contact_email: 'ed@b.example', status: 'email_verified', score: 3, markdown: 'text' } },
+    ];
+    const out = new Function('$input', '$', node.parameters.jsCode)({ all: () => items, first: () => items[0] }, $)
+      .map((o) => o.json);
+    const pitchable = out.filter((o) => o.pitchable).map((o) => o.page_url);
+    const expected = ['https://a.example/high', 'https://b.example/only'];
+    if (JSON.stringify(pitchable) !== JSON.stringify(expected)) {
+      fail(file + ' / Build Pitch Context does not collapse one recipient to one draft: ' + JSON.stringify(pitchable));
+      onePer = false;
+    }
+  }
+  if (onePer) pass('one contact address receives one draft per run, keeping their highest-scoring page');
+}
+
+// --------------------------------------- 7e. no paid call is ever built without its request body
+// Measured: 43 of 61 calls to email_finding.hunter_domain came back
+// `invalid_input: missing property 'domain'`, because the node that built the bodies also decided
+// who to skip, and marked the skipped ones with a flag rather than withholding them. The HTTP node
+// POSTed them anyway. Skipping now happens one node earlier, where a false branch already exists.
+{
+  let bodied = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const decide = wf.nodes.find((n) => n.name === 'Decide Who Needs A Domain Editor');
+    const build = wf.nodes.find((n) => n.name === 'Build Domain Editor Calls');
+    if (!decide || !build) continue;
+    const stubs = {
+      'Confirm Your Business Profile': { run_id: 'r1', spend_ceiling_usd: 0.3 },
+      'Do We Still Need An Email?': { cost_usd: 0 },
+    };
+    const $ = (ref) => ({ first: () => ({ json: stubs[ref] }), all: () => [{ json: stubs[ref] }] });
+    const items = [
+      { json: { page_url: 'https://a.example/1', page_domain: 'a.example', contact_email: '' } },
+      // Same publisher, second page: one call per domain, not per page.
+      { json: { page_url: 'https://a.example/2', page_domain: 'a.example', contact_email: '' } },
+      { json: { page_url: 'https://b.example/1', page_domain: 'b.example', contact_email: 'info@b.example' } },
+      // Third distinct domain: the reservation runs the 0.30 ceiling out before this one.
+      { json: { page_url: 'https://c.example/1', page_domain: 'c.example', contact_email: '' } },
+    ];
+    const decided = new Function('$input', '$', decide.parameters.jsCode)({ all: () => items, first: () => items[0] }, $);
+    const wanted = decided.filter((d) => d.json.needs_domain_editor);
+    if (wanted.length !== 2) {
+      fail(file + ' / the domain-editor decision does not collapse by domain and reserve budget: ' + wanted.length + ' lookups');
+      bodied = false;
+    }
+    const built = new Function('$input', '$', build.parameters.jsCode)({ all: () => wanted, first: () => wanted[0] }, $);
+    const bodiless = built.filter((b) => !b.json.editorBody || !b.json.editorBody.domain || !b.json.editorIdem);
+    if (bodiless.length) {
+      fail(file + ' / Build Domain Editor Calls emits ' + bodiless.length + ' item(s) with no request body');
+      bodied = false;
+    }
+    // A skipped prospect has to survive with a reason, not disappear and not become a bodiless call.
+    if (decided.length !== items.length || decided.filter((d) => !d.json.needs_domain_editor && !d.json.domain_editor_skip_reason).length !== 0) {
+      fail(file + ' / a skipped domain-editor prospect is dropped or carries no reason');
+      bodied = false;
+    }
+  }
+  if (bodied) pass('the domain-editor lookup asks once per domain, inside the ceiling, and never posts an empty body');
+}
+
+// ------------------------------------------- 7d. the identity line ends on a complete thought
+// The one sentence every draft in a run shares, so a bad cut here is not one broken email, it is all
+// of them. Two have shipped: "...eliminating idle costs and." and "...billing from a." Both were a
+// long value proposition cut to length on a word boundary, stopping on a function word.
+{
+  let ends = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const node = wf.nodes.find((n) => n.name === 'Compose The Pitch');
+    if (!node) continue;
+    const preamble = node.parameters.jsCode.split('const prospects =')[0];
+    const build = new Function('VP', preamble + `
+      return assemblePitch(
+        { sender_name: 'Kevin Wang', brand: 'AnyAPI', category: 'scraping API', aliases: ['AnyAPI'],
+          value_prop: VP, page_title: 'The best scraping tools', author_first: 'Andrew',
+          sender_role: 'Founder', brand_domain: 'getanyapi.com', reciprocity: '' },
+        { relevance: 'you cover ten of them but not a per-request option', subject: 'AnyAPI for your piece' },
+      ).body.split('\\n')[2];`);
+    // The first three are the exact value propositions behind the three drafts that shipped with a
+    // truncated identity line. The fourth checks the other half: a second sentence is still dropped.
+    const props = [
+      'Access 327 social, search and enrichment APIs through one key with automatic provider failover and pay-per-request billing from a prepaid USD wallet.',
+      'One API key provides pay-per-request access to hundreds of data APIs with automatic failover, eliminating idle costs and subscription lock-in for teams.',
+      'Access 327 scraping and data APIs behind one key with automatic failover and pay per request from a prepaid USD wallet with no subscriptions.',
+      'A unified data API. We also do enrichment. And search.',
+    ];
+    for (const vp of props) {
+      const line = build(vp);
+      const firstSentence = vp.split(/(?<=[.!?])\s+/)[0].replace(/[.!]+$/, '');
+      // The property is that the whole first sentence survives - not that it ends on an approved
+      // word. Checking a list of allowed final words is what let three of these ship: the list was
+      // extended twice and was still short by one.
+      if (line.indexOf(firstSentence.slice(1)) === -1) {
+        fail(file + ' / the identity line truncates the value proposition: ' + JSON.stringify(line));
+        ends = false;
+      }
+      if (vp.indexOf('We also do') !== -1 && line.indexOf('enrichment') !== -1) {
+        fail(file + ' / the identity line carries more than the first sentence: ' + JSON.stringify(line));
+        ends = false;
+      }
+    }
+  }
+  if (ends) pass('the identity line ends on a complete thought however long the value proposition is');
+}
+
+// ------------------------------------- 7b. the two nodes that decide what counts, executed
+// Both of these were defects that shipped and cost real drafts, so both are held by an executed
+// test rather than by reading the code. The brand list is the one that let a preprint archive and a
+// Cloudflare block page qualify as multi-vendor roundups; the visibility computation is new work
+// this package now does itself, because the SKUs that used to return mentioned/cited were retired.
+let semanticsHold = true;
+{
+  const wf = workflows[0].wf;
+  const code = (n) => (wf.nodes.find((x) => x.name === n) || {}).parameters.jsCode;
+  const runNode = (name, items, stubs) => {
+    const $ = (ref) => ({
+      first: () => ({ json: stubs[ref] }),
+      all: () => (Array.isArray(stubs[ref]) ? stubs[ref] : [stubs[ref]]).map((j) => ({ json: j })),
+    });
+    const fn = new Function('$input', '$', '$execution', code(name));
+    return fn({ all: () => items.map((j) => ({ json: j })), first: () => ({ json: items[0] }) }, $, { id: 't' }).map((r) => r.json);
+  };
+  const profile = {
+    run_id: 't', brand: 'AnyAPI', brand_domain: 'getanyapi.com', aliases: ['AnyAPI', 'getanyapi'],
+    competitors: ['Apify'], category: 'scraping api', icp: '', buyer_prompts: ['p'], cost_usd: 0, spend_ceiling_usd: 2,
+  };
+
+  const harvest = { answers: [{ found: true, data: {
+    answer: 'Major providers exist. Whether HTML or JSON, Community support is Official.',
+    citations: [{ url: 'https://scrapfly.io/blog' }, { url: 'https://github.com/a/b' }, { url: 'https://arxiv.org/abs/1' }],
+  } }] };
+  const brands = runNode('Name Every Brand In The Answers', [harvest], { 'Confirm Your Business Profile': profile })[0].brands_named;
+  const leaked = ['Major', 'Whether', 'Community', 'Official', 'HTML', 'JSON', 'Github', 'Arxiv'].filter((w) => brands.indexOf(w) !== -1);
+  if (leaked.length) { fail('the brand list counts prose words or non-vendor domains as vendors: ' + leaked.join(', ')); semanticsHold = false; }
+  if (brands.indexOf('Scrapfly') === -1) { fail('the brand list drops a vendor an engine actually cited'); semanticsHold = false; }
+
+  const resp = (body, status) => ({ statusCode: status || 200, body });
+  const ans = (text, cites, searched) => ({ costUsd: 0.0018, output: { found: true, data: { answer: text, citations: cites, webSearchTriggered: searched } } });
+  const v = runNode('Verify Engine Answers', [{}], {
+    'Confirm Your Business Profile': profile,
+    'Build Visibility Calls': [{ prompt: 'p1' }, { prompt: 'p2' }],
+    'AnyAPI Ask ChatGPT': [resp(ans('Try ManyAPIs today.', [], true)), resp(ans('written from memory', [], false))],
+    'AnyAPI Ask Perplexity': [resp(ans('Use Apify.', [{ url: 'https://getanyapi.com/x' }], true)), resp('bad gateway', 502)],
+    'AnyAPI Ask Google AI Overview': [resp(ans('AnyAPI is one option.', [], true)), resp(ans('x', [], true))],
+  })[0];
+  const p1chat = v.visibility.find((x) => x.prompt === 'p1' && x.engine === 'chatgpt');
+  if (!p1chat || p1chat.mentioned !== false) { fail('"ManyAPIs" is read as a mention of AnyAPI - the alias match lost its word boundary'); semanticsHold = false; }
+  if (v.visibility.filter((x) => x.cited).length !== 1) { fail('cited counts a citation that is not on your own domain'); semanticsHold = false; }
+  if (v.visibility.length !== 4) { fail('an engine answer that never ran a search is being counted in the visibility denominator'); semanticsHold = false; }
+}
+if (semanticsHold) pass('the brand list refuses prose words, and visibility counts only answers that actually searched');
+
+// ---------------------------------------------------------------- 8. no unexplained number in the prose
 // Everything the prose is allowed to say that is not a measured value. Each one is a published
 // price, a verified platform constant, or a shape of this package.
 const ALLOWED = new Map([
@@ -234,9 +533,8 @@ const ALLOWED = new Map([
   [2.2, 'Gmail node typeVersion'],
   [1.2, 'the gmailTrigger typeVersion above which SENT mail is discarded'],
   [6000, 'characters of page text the pitch step is shown'],
-  [89, 'nodes in the pro prospector'],
-  [66, 'nodes in the lite prospector'],
-  [15, 'nodes in the follow-up drafter'],
+  // Node counts are not listed here on purpose: they are read off the shipped JSON below, because a
+  // hand-maintained count is exactly the kind of constant that goes stale and still passes.
   // Development measurements. These come from the runs that found the bugs described in the
   // README and PROOF.md, not from the published run, and PROOF.md lists them under the run that
   // produced them.
@@ -257,6 +555,35 @@ const ALLOWED = new Map([
   [6, 'runs it took, and other small measured counts'],
   [70, 'milliseconds each of those 502s took to come back'],
   [200, 'HTTP success, and the minimum characters of site text the run requires'],
+  // Published AnyAPI prices quoted in the cost table.
+  [0.0018, 'the published price of perplexity.search and google.ai_overview'],
+  [0.0036, 'the published price of chatgpt.search'],
+  [0.036, 'the published price of email_finding.hunter_domain, per contact returned'],
+  [43, 'bodiless hunter_domain calls measured in one run'],
+  [61, 'calls to that SKU in that run'],
+  // Engine timeouts, each set from what that engine actually takes.
+  [180000, 'the chatgpt.search timeout in milliseconds'],
+  [120000, 'the perplexity.search timeout in milliseconds'],
+  [240000, 'the google.ai_overview timeout in milliseconds'],
+  // The concurrency failure described in the README.
+  [300, 'concurrent scrapes at which a run aborted'],
+  [146, 'calls that had completed cleanly earlier in that same run'],
+  [11, 'minutes, rounded down from the measured wall time'],
+  // The number of sites judged is the sum of the verdicts, which the record carries separately.
+  [184, 'sites judged, the sum of the two publisher verdicts'],
+  // Development measurements from the runs that found the defects PROOF.md describes.
+  [207, 'domains judged in the run that tested keeping unclear verdicts'],
+  [78, 'of those judged unclear, which is why that rule was reverted'],
+  [21, 'of those judged publisher in that same run'],
+  [38, 'percent of that run judged unclear'],
+  [20, 'pages rejected for naming no vendor, and other small measured counts'],
+  [0.362300, 'the spend the run record reported before it read every paid node'],
+  [0.462400, 'the spend actually charged in that same run'],
+  [17, 'pitches composed in the run where the vendor check rejected ten of them'],
+  [503, 'the largest cited-URL count measured across development runs'],
+  [16, 'drafts produced by the run that sent four emails to one editor'],
+  [10, 'pitches the excerpt-only vendor check wrongly rejected, of 17'],
+  [18, 'the most passing drafts measured across development runs'],
 ]);
 
 const measuredNumbers = new Set();
@@ -264,10 +591,22 @@ const measuredNumbers = new Set();
   if (typeof v === 'number') { measuredNumbers.add(v); return; }
   if (Array.isArray(v)) { v.forEach(collect); return; }
   if (v && typeof v === 'object') { Object.values(v).forEach(collect); }
-}(sample));
+}(samples.map((s) => s.sample)));
+
+// A node count quoted in the prose is measured too - off the file it describes.
+for (const file of FILES) {
+  const wf = parse('.', file);
+  measuredNumbers.add(wf.nodes.length);
+  measuredNumbers.add(new Set(wf.nodes.map((n) => n.type)).size);
+  measuredNumbers.add(wf.nodes.filter((n) => n.type === 'n8n-nodes-base.stickyNote').length);
+}
 
 const stripCodeAndLinks = (text) => text
   .replace(/```[\s\S]*?```/g, ' ')
+  // Reddit does not render fenced blocks, so the post draft indents its example draft by four
+  // spaces instead. That is the same thing as a fence and has to be exempt the same way: the
+  // numbers inside a quoted email are that email's, not claims the post is making.
+  .replace(/^ {4,}\S.*$/gm, ' ')
   .replace(/`[^`]*`/g, ' ')
   .replace(/\]\([^)]*\)/g, '] ')
   .replace(/https?:\/\/\S+/g, ' ')
@@ -275,10 +614,18 @@ const stripCodeAndLinks = (text) => text
   .replace(/^\s{0,3}#{0,6}\s*\d+\.\s/gm, ' ');
 
 let prosePasses = true;
-for (const doc of ['README.md', 'PROOF.md', 'REDDIT_DRAFT.md']) {
+// The n8n listing is checked too: it is the copy most people will read without ever seeing the
+// repo, and it is the easiest one to leave stale after a re-run. It is also the one file where the
+// fenced blocks ARE the claims - the whole listing is fenced so it can be pasted - so stripping
+// them would have made this check pass while reading nothing. It did, briefly: "$0.71 of API
+// spend" sat unchecked inside a fence.
+const FENCED_COPY_IS_THE_CLAIM = new Set(['N8N_TEMPLATE.md']);
+for (const doc of ['README.md', 'PROOF.md', 'REDDIT_DRAFT.md', 'N8N_TEMPLATE.md']) {
   const raw = read(doc);
   if (/\{\{|\[TODO\]|XXX/.test(raw)) { fail(doc + ' still contains a placeholder'); prosePasses = false; }
-  const text = stripCodeAndLinks(raw);
+  const text = FENCED_COPY_IS_THE_CLAIM.has(doc)
+    ? stripCodeAndLinks(raw.replace(/^```\w*$/gm, ''))
+    : stripCodeAndLinks(raw);
   const seen = new Set();
   for (const m of text.matchAll(/(?<![\w.])\$?(\d[\d,]*(?:\.\d+)?)(?![\w])/g)) {
     const value = Number(m[1].replace(/,/g, ''));
@@ -289,7 +636,7 @@ for (const doc of ['README.md', 'PROOF.md', 'REDDIT_DRAFT.md']) {
     prosePasses = false;
   }
 }
-if (prosePasses) pass('every number in README.md and PROOF.md is measured or explained');
+if (prosePasses) pass('every number in the README, the proof, the post draft and the n8n listing is measured or explained');
 
 if (failed) { console.error('\n' + failed + ' check(s) failed.'); process.exit(1); }
 console.log('\nVerification complete.');

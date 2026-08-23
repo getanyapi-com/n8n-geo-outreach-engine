@@ -1,0 +1,964 @@
+{
+  "run": {
+    "workflow": "GEO Prospector (pro)",
+    "executed_by": "proof/run-proof-pro.mjs, which runs the Code nodes out of the shipped workflow JSON and calls the chainLlm nodes' model over OpenRouter",
+    "gmail_executed": false,
+    "run_id": "pro-1",
+    "started_at": "2026-08-23T23:23:37.692Z",
+    "harness_wall_seconds": 722.959,
+    "anyapi_calls": 450,
+    "anyapi_cost_usd": 0.55559,
+    "model_calls": 40,
+    "model_failed_attempts": 0,
+    "model_cost_usd": 0.035604,
+    "total_cost_usd": 0.591194
+  },
+  "inputs": {
+    "website": "https://getanyapi.com",
+    "brand": "AnyAPI",
+    "category": "scraping API",
+    "competitors": [
+      "Apify",
+      "Bright Data",
+      "ScraperAPI",
+      "SerpApi"
+    ],
+    "spend_ceiling_usd": 2
+  },
+  "buyer_prompts": [
+    "best Instagram scraping API for competitor monitoring",
+    "best Reddit scraping API for sentiment analysis",
+    "best LinkedIn scraping API for B2B lead enrichment",
+    "best TikTok scraping API for UGC tracking",
+    "best Google Maps scraping API for local business data",
+    "best Google search scraping API for SEO rank tracking",
+    "best Ahrefs API for SEO data without enterprise contract",
+    "best Apollo API alternative for email finding and verification",
+    "recommended GitHub scraping API for developer data",
+    "best Indeed scraping API for job postings data",
+    "which Facebook scraping API handles automatic failover",
+    "best Zillow scraping API for real estate listings",
+    "alternatives to Apify for Instagram scraping",
+    "alternatives to Bright Data for web scraping",
+    "alternatives to ScraperAPI for pay per request scraping",
+    "alternatives to SerpApi for Google search scraping",
+    "best scraping API platform for developers who want no subscription"
+  ],
+  "funnel": {
+    "prompts_count": 17,
+    "engine_calls": 51,
+    "engine_calls_empty": 0,
+    "engine_calls_failed": 3,
+    "visibility_checks": 39,
+    "visibility_mentioned": 0,
+    "visibility_cited": 0,
+    "citations_harvested": 471,
+    "pages_considered": 517,
+    "pages_after_ownership_filter": 334,
+    "ownership_counts": {
+      "competitor": 94,
+      "first_party_vendor": 31,
+      "third_party": 334,
+      "platform": 58
+    },
+    "publisher_verdicts": {
+      "vendor": 106,
+      "publisher": 78
+    },
+    "pages_scraped": 104,
+    "pages_rejected_not_roundup": 65,
+    "pages_already_listing_you": 0,
+    "contacts_from_page": 15,
+    "contacts_from_contact_page": 4,
+    "contacts_from_email_find": 6,
+    "contacts_none": 14,
+    "emails_rejected": 3,
+    "emails_verified": 19,
+    "drafts_passed_verify": 17,
+    "drafts_rejected_verify": 2,
+    "drafts_created_in_gmail": null
+  },
+  "costs": {
+    "anyapi_usd": 0.55559,
+    "openrouter_usd": 0.035604,
+    "spend_ceiling_usd": 2,
+    "by_node": {
+      "AnyAPI Scrape Your Website": 0.0007,
+      "AnyAPI Ask ChatGPT": 0.0648,
+      "AnyAPI Ask Perplexity": 0.0252,
+      "AnyAPI Ask Google AI Overview": 0.0306,
+      "AnyAPI Resolve Competitor Domains": 0.00396,
+      "AnyAPI Rank Buyer Prompts On Google": 0.01683,
+      "AnyAPI Scrape The Publisher Home": 0.1309,
+      "AnyAPI Scrape The Page": 0.0737,
+      "AnyAPI Scrape The Contact Page": 0.0252,
+      "AnyAPI Find The Author Email": 0.1617,
+      "AnyAPI Find The Domain Editor": 0,
+      "AnyAPI Verify The Email": 0.022
+    },
+    "by_model_node": {
+      "Profile Your Business": 0.00103,
+      "Judge Page Ownership": 0.003728,
+      "Judge Who Runs The Site": 0.015686,
+      "Write The Pitch": 0.015161
+    }
+  },
+  "drafts": [
+    {
+      "page_url": "https://getairefs.com/blog/best-serp-apis",
+      "publisher": "getairefs.com",
+      "page_title": "Best Google Search APIs in 2026 (Since Google Won't Give You One)",
+      "cited_pairs": 2,
+      "engines": [
+        "perplexity"
+      ],
+      "prompts": [
+        "best Google search scraping API for SEO rank tracking",
+        "alternatives to SerpApi for Google search scraping"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "getairefs.com",
+      "contact_source": "contact_page",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"Best Google Search APIs in 2026 (Since Google Won't Give You One)\"",
+      "quoted_snippet": "Four market forces have reshaped the SERP API landscape heading into 2026:",
+      "page_text_excerpt": "le doesn’t offer an official SERP API. It deprecated its Web Search API in 2011, then closed its Custom Search JSON API to new customers in 2025. The hard shutdown date is January 1, 2027. Everything in this guide is a third-party solution. For a broader look at how these APIs work and what you can build with one, see our [SEO ranking API guide](https://getairefs.com/blog/seo-ranking-api-guide/). Four market forces have reshaped the SERP API landscape heading into 2026: 1. Google Custom Search JSON API sunset — teams that relied on it need a replacement now, not later. 2. AI Overview parsing — approximately 48% of tracked queries now trigger [AI Overviews](https://getairefs.com/blog/how-to-rank-in-ai-overviews/). APIs that can’t parse them return incomplete data. 3. Multi-surface requirements — brand visibility now requires tracking ChatGPT, [Perplexity](https:/"
+    },
+    {
+      "page_url": "https://sequenzy.com/blog/best-web-scraping-apis",
+      "publisher": "sequenzy.com",
+      "page_title": "13 Best Web Scraping APIs in 2026 | Sequenzy",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best scraping API platform for developers who want no subscription"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "sequenzy.com",
+      "contact_source": "contact_page",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"13 Best Web Scraping APIs in 2026\"",
+      "quoted_snippet": "The best web scraping API is not the one with the longest feature list.",
+      "page_text_excerpt": "AI](https://sequenzy.com/blog/tag/ai) [Developer Tools](https://sequenzy.com/blog/tag/developer-tools) [Data](https://sequenzy.com/blog/tag/data) # 13 Best Web Scraping APIs in 2026 ![Nik](https://sequenzy.com/images/authors/nik.jpg) Nik [@nikpolale](https://x.com/nikpolale) June 20, 2026 23 min read ![13 Best Web Scraping APIs in 2026](https://sequenzy.com/images/blog/best-web-scraping-apis.jpg) The best web scraping API is not the one with the longest feature list. It is the one that gives you the data shape you actually need, at a price you can predict, without turning your engineering team into a proxy operations team. For most modern teams, that means one of four jobs: - Turn a URL into clean Markdown for an AI agent or RAG pipeline. - Extract structured data from pages that do not expose an API. - Crawl enough of a site to keep a dataset fresh. - Get pa"
+    },
+    {
+      "page_url": "https://seoprofy.com/blog/seo-data-api",
+      "publisher": "seoprofy.com",
+      "page_title": "10 Best SEO Data APIs for Technical Teams & LLM Pipelines",
+      "cited_pairs": 0,
+      "engines": [],
+      "prompts": [
+        "best Ahrefs API for SEO data without enterprise contract"
+      ],
+      "discovery_source": "serp",
+      "recipient_domain": "seoprofy.com",
+      "contact_source": "contact_page",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"10 Best SEO Data APIs for Technical Teams & LLM Pipelines\"",
+      "quoted_snippet": "NEW: AI SEO Playbook How to win visibility in AI search results",
+      "page_text_excerpt": "NEW: AI SEO Playbook How to win visibility in AI search results [Download Free](https://seoprofy.com/whitepapers/ai-seo-playbook/) [![SeoProfy](https://seoprofy.com/wp-content/themes/seoprofy/img/logo.svg)](https://seoprofy.com) - About - [About Us](https://seoprofy.com/about/) - [Our Team](https://seoprofy.com/our-team/) - [Our Awards](https://seoprofy.com/awards/) - [Our Values](https://seoprofy.com/our-values/) - [Contact Us](https://seoprofy.com/contact-u"
+    },
+    {
+      "page_url": "https://nextgrowth.ai/best-seo-api",
+      "publisher": "nextgrowth.ai",
+      "page_title": "11 Best SEO APIs in 2026: Compare by Price & Coverage",
+      "cited_pairs": 3,
+      "engines": [
+        "perplexity",
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best Google search scraping API for SEO rank tracking",
+        "best Ahrefs API for SEO data without enterprise contract"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "nextgrowth.ai",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"11 Best SEO APIs in 2026: Compare by Price & Coverage\"",
+      "quoted_snippet": "Pay-per-call beats subscription for most teams spending under $300/mo equivalent, no wasted seat licenses",
+      "page_text_excerpt": "roxy rotation > - Google Search Console API and PageSpeed Insights API are free and essential for technical audits > - Pricing ranges from free tiers to enterprise subscriptions,pay-per-request models offer granular cost control TL;DR - Best SEO APIs by use case: DataForSEO (enterprise data), SerpApi (real-time SERP), GSC API (free first-party), Moz (backlinks), Screaming Frog (technical audit) - Pay-per-call beats subscription for most teams spending under $300/mo equivalent, no wasted seat licenses - Free tiers available: Google Search Console API (unlimited, OAuth), DataForSEO ($50 trial), ValueSERP (100 free/day) - For AI agents and MCP workflows, DataForSEO’s structured JSON is the cleanest integration, Bright Data works better for raw HTML - Match the API to your use case first, wrong API costs more in engineering time than in API fees 8 APIs reviewed $0 GSC API cost [$0.0006](https://d"
+    },
+    {
+      "page_url": "https://lindy.ai/blog/linkedin-scraper",
+      "publisher": "lindy.ai",
+      "page_title": "10 Best LinkedIn Scrapers for Data Extraction in 2026 | Lindy",
+      "cited_pairs": 2,
+      "engines": [
+        "perplexity",
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best LinkedIn scraping API for B2B lead enrichment"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "lindy.ai",
+      "contact_source": "page_mailto",
+      "email_status": "risky",
+      "subject": "AnyAPI for your 10 Best LinkedIn Scrapers list",
+      "quoted_snippet": "Everett reviewed 10 LinkedIn scrapers including Evaboot, ScrapIn, and BrightData, weighing pricing, compliance risk, and lead-export quality for sales and recruiting teams.",
+      "page_text_excerpt": "n](https://chat.lindy.ai/login) - [Try for free](https://chat.lindy.ai/signup)Try for free Try for free - [Log in](https://chat.lindy.ai/login) - [Try for free](https://chat.lindy.ai/signup)Try for free Try for free [Blog](https://lindy.ai/blog) / [AI Tools](https://lindy.ai/blog) # 10 Best LinkedIn Scrapers for Data Extraction in 2026 Written by Everett Butler Personally Tested Head of Marketing Everett reviewed 10 LinkedIn scrapers including Evaboot, ScrapIn, and BrightData, weighing pricing, compliance risk, and lead-export quality for sales and recruiting teams. ![Everett Butler](https://cdn.prod.website-files.com/6418bbd648ad4081cf60eb29/6a6359b3a4145a3f4d90b2c1_Everett.avif) ![Everett Butler](https://cdn.prod.website-files.com/6418bbd648ad4081cf60eb29/67fdc5832c62cf229832d6d1_Everett_Imagery1.avif) Everett Butler Head of Marketing Everett is Head of Marketing at Lindy. He’s focused on building a world class brand for Lindy and driving awareness, growth"
+    },
+    {
+      "page_url": "https://affiliatebooster.com/best-web-scraping-apis",
+      "publisher": "affiliatebooster.com",
+      "page_title": "8 Best Web Scraping APIs in 2026✅: Our Top Picks",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best Google search scraping API for SEO rank tracking"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "affiliatebooster.com",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for your 8 Best Web Scraping APIs in 2026",
+      "quoted_snippet": "Getting data from websites is tough—CAPTCHAs, rate limits, and dynamic content cause issues.",
+      "page_text_excerpt": "ntent/uploads/2024/12/Scraper-API-Logo-1.webp) - Easy-to-use API - Auto proxy rotation - Solves CAPTCHAs - Best for developers & startups [Try Now](https://www.scraperapi.com/) > Want a quick answer? When it comes to the Best Web Scraping APIs, most people consider [Bright Data](https://www.bytegain.com/Recommended/luminati/) and [Oxylabs](https://bytegain.com/Recommended/oxylabs/) as top choices Getting data from websites is tough—CAPTCHAs, rate limits, and dynamic content cause issues. Web scraping APIs simplify this with automation and built-in proxies. The best APIs handle these challenges smoothly, but not all perform equally. Some struggle, while others make scraping seamless. In this guide, I’ll cover the 8 best web scraping APIs of 2026, their strengths, limitations, and the best fit for you. ## What is Web Scraping API? A Web Scraping API is a tool that makes extracting "
+    },
+    {
+      "page_url": "https://aimultiple.com/serp-scraper-api",
+      "publisher": "aimultiple.com",
+      "page_title": "We Tested the Best SERP Scraper APIs in 2026",
+      "cited_pairs": 3,
+      "engines": [
+        "chatgpt",
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "alternatives to SerpApi for Google search scraping",
+        "best Google search scraping API for SEO rank tracking"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "aimultiple.com",
+      "contact_source": "email_find",
+      "email_status": "risky",
+      "subject": "AnyAPI for your SERP Scraper APIs in 2026 piece",
+      "quoted_snippet": "Web Data ScrapingWeb ProxiesData CollectionData ScienceSynthetic Data",
+      "page_text_excerpt": "ckup-software) [SaaS Backup Solutions](https://aimultiple.com/saas-backup-solutions) [Data Loss Prevention](https://aimultiple.com/data-loss-prevention) [DLP Software](https://aimultiple.com/dlp-software) [Device Control Software](https://aimultiple.com/device-control-software) [DLP Review](https://aimultiple.com/dlp-review) [See All](https://aimultiple.com/category/data-security) Data CATEGORIES Web Data ScrapingWeb ProxiesData CollectionData ScienceSynthetic Data [Browse Categories](https://aimultiple.com/data) [Ecommerce Scraper](https://aimultiple.com/ecommerce-scraper) [Craigslist Scraper](https://aimultiple.com/craigslist-scraper) [YouTube Datasets](https://aimultiple.com/youtube-datasets) [LinkedIn Scrapers](https://aimultiple.com/linkedin-scrapers) [Amazon Scraper](https://aimultiple.com/amazon-scraper) [Social Media Datasets](https://aimultiple.com"
+    },
+    {
+      "page_url": "https://aimultiple.com/tiktok-scraping",
+      "publisher": "aimultiple.com",
+      "page_title": "Best TikTok Scrapers: Scrape Video & Profile Data",
+      "cited_pairs": 2,
+      "engines": [
+        "chatgpt",
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best TikTok scraping API for UGC tracking"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "aimultiple.com",
+      "contact_source": "email_find",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"Best TikTok Scrapers: Scrape Video & Profile Data\"",
+      "quoted_snippet": "Web Data ScrapingWeb ProxiesData CollectionData ScienceSynthetic Data",
+      "page_text_excerpt": "ckup-software) [SaaS Backup Solutions](https://aimultiple.com/saas-backup-solutions) [Data Loss Prevention](https://aimultiple.com/data-loss-prevention) [DLP Software](https://aimultiple.com/dlp-software) [Device Control Software](https://aimultiple.com/device-control-software) [DLP Review](https://aimultiple.com/dlp-review) [See All](https://aimultiple.com/category/data-security) Data CATEGORIES Web Data ScrapingWeb ProxiesData CollectionData ScienceSynthetic Data [Browse Categories](https://aimultiple.com/data) [Ecommerce Scraper](https://aimultiple.com/ecommerce-scraper) [Craigslist Scraper](https://aimultiple.com/craigslist-scraper) [YouTube Datasets](https://aimultiple.com/youtube-datasets) [LinkedIn Scrapers](https://aimultiple.com/linkedin-scrapers) [Amazon Scraper](https://aimultiple.com/amazon-scraper) [Social Media Datasets](https://aimultiple.com"
+    },
+    {
+      "page_url": "https://alexberman.com/twitter-scraping-github",
+      "publisher": "alexberman.com",
+      "page_title": "Twitter Scraping GitHub: Best Tools & Libraries",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "recommended GitHub scraping API for developer data"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "alexberman.com",
+      "contact_source": "email_find",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"Twitter Scraping GitHub: Best Tools & Libraries\"",
+      "quoted_snippet": "A no-BS breakdown of every major open-source Twitter scraper, their limitations, and when to stop fighting X's API and use better lead sources.",
+      "page_text_excerpt": ") [Tools](https://alexberman.com/tools) [Try ScraperCity](https://scrapercity.com?utm_source=alexberman&utm_medium=twitter-scraping-github&utm_campaign=cta) [Free Leads](https://scrapercity.com/b2b-email-database?utm_source=alexberman&utm_medium=nav&utm_campaign=site) [Home](https://alexberman.com/)/%20[Twitter/X%20B2B](/twitter-b2b) Twitter/X B2B # Twitter Scraping GitHub: Best Tools & Libraries A no-BS breakdown of every major open-source Twitter scraper, their limitations, and when to stop fighting X's API and use better lead sources. ![Alex Berman](https://alexberman.com/img/img_5.jpg)Alex Berman·Feb 13, 2026·22 min read ### Which Twitter Scraping Approach Is Right For You? Answer 4 quick questions and get a specific tool recommendation - plus the exact risks you should know before building anything. 1\\. What's your technical background? Developer (Python/Go comfortable) Semi-technical (can run scripts) Non-technical (no code"
+    },
+    {
+      "page_url": "https://designveloper.com/blog/best-web-scraping-tools",
+      "publisher": "designveloper.com",
+      "page_title": "10+ Best Web Scraping Tools (Free & Paid) - Designveloper",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "alternatives to SerpApi for Google search scraping"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "designveloper.com",
+      "contact_source": "email_find",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"10+ Best Web Scraping Tools (Free & Paid)\"",
+      "quoted_snippet": "Web App Development When it comes to web application development services, Designveloper is the industry leader.",
+      "page_text_excerpt": "opers will create long-term value with our software development services.![](https://www.designveloper.com/wp-content/themes/designveloper-light-theme/images/arrow-long-right.svg)](https://www.designveloper.com/services/software-development-services/) ![react-development-services-banner-2024-2](https://www.designveloper.com/wp-content/uploads/2024/05/react-development-services-banner-2024-2.png) [Web App Development When it comes to web application development services, Designveloper is the industry leader.![](https://www.designveloper.com/wp-content/themes/designveloper-light-theme/images/arrow-long-right.svg)](https://www.designveloper.com/services/web-application-development-services/) ![cyber-security-consultant-services-banner-1](https://www.designveloper.com/wp-content/uploads/2024/05/cyber-security-consultant-services-banner-1.png) [Mobile App Development Empower your brand with Designveloper"
+    },
+    {
+      "page_url": "https://techradar.com/pro/software-services/best-scraper-api-best-web-scraping-api-of-year",
+      "publisher": "techradar.com",
+      "page_title": "Best Scraper API (best web scraping API) of 2025 | TechRadar",
+      "cited_pairs": 4,
+      "engines": [
+        "chatgpt"
+      ],
+      "prompts": [
+        "best Instagram scraping API for competitor monitoring",
+        "best LinkedIn scraping API for B2B lead enrichment",
+        "recommended GitHub scraping API for developer data",
+        "best scraping API platform for developers who want no subscription"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "techradar.com",
+      "contact_source": "contact_page",
+      "email_status": "good",
+      "subject": "AnyAPI for your Best Scraper API of 2025 piece",
+      "quoted_snippet": "Get daily news, weekly deals and the week’s top tech stories",
+      "page_text_excerpt": "est-web-scraping-api-of-year#main) ![](https://cdn.mos.cms.futurecdn.net/flexiimages/zdve3chhhn1770884186.jpg) ![](https://cdn.mos.cms.futurecdn.net/flexiimages/ay9ub1r1gc1775132364.svg) Become a TechRadar Insider \\- Join our community JOIN NOW 5 Exclusive perks 24/7 Insider insights 44K+ Active Members ![](https://cdn.mos.cms.futurecdn.net/flexiimages/dguzmo7zgs1770884431.svg) Weekly newsletters Get daily news, weekly deals and the week’s top tech stories ![](https://cdn.mos.cms.futurecdn.net/flexiimages/bmmrou9qte1770884450.svg) Commenting access Join the conversation, share your thoughts and get expert advice ![](https://cdn.mos.cms.futurecdn.net/flexiimages/qt8r3iglph1770885239.svg) Member badges Earn badges as you explore news, deals, reviews, guides and more ![](https://cdn.mos.cms.futurecdn.net/flexiimages/a5se7egktb1770885207.svg) Exclusive"
+    },
+    {
+      "page_url": "https://onrec.com/news/dataforseo-alternatives-a-comparative-analysis-of-professional-seo-and-serp-apis",
+      "publisher": "onrec.com",
+      "page_title": "DataForSEO Alternatives: A Comparative Analysis of Professional SEO and SERP APIs | Onrec",
+      "cited_pairs": 2,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best Google search scraping API for SEO rank tracking",
+        "alternatives to SerpApi for Google search scraping"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "onrec.com",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"DataForSEO Alternatives: A Comparative Analysis of Professional SEO\"",
+      "quoted_snippet": "DataForSEO has long been a pillar of this infrastructure, offering a robust suite of APIs that provide everything from raw SERP data to backlink metrics and on-page analysis.",
+      "page_text_excerpt": "](https://onrec.com/news/all) - » DataForSEO Alternatives: A Comparative Analysis of Professional SEO and SERP APIs ![placeholder](https://onrec.com/sites/onrec/directory/files/Stuart-Gentle.jpg) Stuart Gentle Publisher at Onrec - 29 Apr 2026 | # DataForSEO Alternatives: A Comparative Analysis of Professional SEO and SERP APIs ![](https://onrec.com/sites/onrec/directory/files/cover%20%281%29.jpg) DataForSEO has long been a pillar of this infrastructure, offering a robust suite of APIs that provide everything from raw SERP data to backlink metrics and on-page analysis. However, the shift toward \"Answer Engine Optimization\" (AEO) and the need for more integrated, agency-focused reporting have led many organizations to seek more specialized alternatives. In this evolving landscape, the SE Ranking API stands out as the premier DataForSEO alternative, offering a superior balance of data accuracy, professional-grade reporting tools, and a comprehensive suite of AI v"
+    },
+    {
+      "page_url": "https://codewords.ai/blog/web-data-extraction-tools",
+      "publisher": "codewords.ai",
+      "page_title": "The 12 best web data extraction tools for your 2025 tech stack | CodeWords",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best Zillow scraping API for real estate listings"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "codewords.ai",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for \"The 12 best web data extraction tools for your 2025 tech stack\"",
+      "quoted_snippet": "You spend hours copying and pasting, only for the information to become obsolete almost immediately.",
+      "page_text_excerpt": " intelligence. We’ll show you how to move beyond simple scraping to build automated data pipelines. According to Gartner's 2023 forecast, by 2025, 70% of organizations will shift their focus from big data to small and wide data, prioritizing relevance over sheer volume. For non-technical teams, the manual process of gathering competitive pricing or market trends is a significant operational drag. You spend hours copying and pasting, only for the information to become obsolete almost immediately. This list promises to solve that problem by showcasing platforms designed for efficiency, from simple browser extensions to sophisticated AI-powered systems. We will explore each tool’s ideal use cases, pricing, and unique features. Unlike generic AI automation posts, this guide will show you real CodeWords workflows — not just theory. You will find a direct path to selecting the right tool for y"
+    },
+    {
+      "page_url": "https://folk.app/articles/best-linkedin-data-scrapers",
+      "publisher": "folk.app",
+      "page_title": "13 Best LinkedIn Data Scrapers (2026 List)",
+      "cited_pairs": 1,
+      "engines": [
+        "perplexity"
+      ],
+      "prompts": [
+        "best LinkedIn scraping API for B2B lead enrichment"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "folk.app",
+      "contact_source": "page_mailto",
+      "email_status": "risky",
+      "subject": "AnyAPI for your 13 Best LinkedIn Data Scrapers list",
+      "quoted_snippet": "A LinkedIn data scraper captures profile and company data from searches, Sales Navigator lists, and engagement sources, then exports it into clean lead lists",
+      "page_text_excerpt": "163561_Group%2032034.webp) [Simo Lemhandez](https://folk.app/authors/simo-lemhandez) Founder Discover folk - the CRM for people-powered businesses [Book a demo](https://folk.app/contact-sales) LinkedIn is the largest B2B database in plain sight. The real competitive edge is not finding prospects. It is turning LinkedIn signals into structured data before competitors even finish manual copy-paste. A LinkedIn data scraper captures profile and company data from searches, Sales Navigator lists, and engagement sources, then exports it into clean lead lists for enrichment and outreach. No spreadsheet chaos. No missed follow-ups caused by incomplete records. With the right scraper, LinkedIn stops being a browsing platform and becomes a repeatable data engine for B2B pipeline generation. ## What is a LinkedIn Data Scraper? 👉 A LinkedIn data scraper is a tool that extracts structured information from LinkedIn profiles, search results, and company page"
+    },
+    {
+      "page_url": "https://guideflow.com/blog/linkedin-scraping-software-tools",
+      "publisher": "guideflow.com",
+      "page_title": "17 best LinkedIn scraping tools for sales teams in 2026 - Guideflow Blog",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best LinkedIn scraping API for B2B lead enrichment"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "guideflow.com",
+      "contact_source": "page_mailto",
+      "email_status": "risky",
+      "subject": "AnyAPI for your 17 best LinkedIn scraping tools list",
+      "quoted_snippet": "17 best LinkedIn scraping tools for sales teams in 2026",
+      "page_text_excerpt": "n.prod.website-files.com/66ccc46cf22dd5a6d5d08bef/68519bcb1d10ba2bbc0cfbaf_Image%20Wrapper.svg)](https://guideflow.com/download) [Pricing](https://guideflow.com/pricing) [Let's talk](#) [Get started](#) [Talk to us](#) [Start for free](https://app.guideflow.com/auth/sign-up) [Blog](https://guideflow.com/blog) [Best tools](https://guideflow.com/blog-categories/best-tools) Best tools ・ 5 min read # 17 best LinkedIn scraping tools for sales teams in 2026 ![17 best LinkedIn scraping tools for sales teams in 2026](https://cdn.prod.website-files.com/66ccf78be99d9f56e3f51096/6a1579d0ffd86cc4e5c9a9c2_linkedin-scraping-tools-cover.avif) "
+    },
+    {
+      "page_url": "https://numerous.ai/blog/bright-data-alternatives",
+      "publisher": "numerous.ai",
+      "page_title": "7 Best Bright Data Alternatives for Web Scraping in 30 Minutes - Numerous.ai",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "alternatives to Bright Data for web scraping"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "numerous.ai",
+      "contact_source": "page_mailto",
+      "email_status": "risky",
+      "subject": "AnyAPI for \"7 Best Bright Data Alternatives for Web Scraping in 30 Minutes\"",
+      "quoted_snippet": "Bright Data's residential proxies run between $5.88 and $10.50 per GB with a $499 monthly minimum",
+      "page_text_excerpt": "Teams Look for Alternatives to Bright Data - The Hidden Cost of the Missing Middle-Tier Pricing Gap - 7 Best Bright Data Alternatives for Web Scraping in 30 Minutes - The 30-Minute Workflow to Choose a Bright Data Alternative - Analyze Your Extracted Data Faster With Numerous ## Summary - Web scraping costs are structured to push mid-volume teams toward commitments that exceed their actual needs. Bright Data's residential proxies run between $5.88 and $10.50 per GB with a $499 monthly minimum, and the pay-as-you-go alternative costs roughly 50% more per request. Teams running moderate workloads, such as weekly competitor price checks or monthly market research, often find neither pricing tier reflects what their workflow actually requires. - Overage risk compounds the cost problem in ways most teams do not anticipate until the bill arrives. One documented case shows a team exhausting "
+    },
+    {
+      "page_url": "https://oppora.ai/blog/google-maps-lead-scraper",
+      "publisher": "oppora.ai",
+      "page_title": "10 Best Google Maps Lead Scraper Tools to Find Local Leads Fast",
+      "cited_pairs": 1,
+      "engines": [
+        "google_ai_overview"
+      ],
+      "prompts": [
+        "best Google Maps scraping API for local business data"
+      ],
+      "discovery_source": "citation",
+      "recipient_domain": "oppora.ai",
+      "contact_source": "page_mailto",
+      "email_status": "good",
+      "subject": "AnyAPI for your Google Maps lead scraper list",
+      "quoted_snippet": "Scrolling through hundreds of Google Maps listings to find the right local leads? That gets old fast.",
+      "page_text_excerpt": "oppora.ai%2Fcontent%2Fimages%2F2026%2F07%2F10-Best-Google-Maps-Lead-Scraper-Tools-to-Find-Local-Leads-Fast.webp&w=3840&q=75) ![Drag \\& Drop](https://oppora.ai/_next/image/?url=%2Fassets%2Fimages%2Fhome%2Fflow-builder%2Fworkflow-image-updated.png&w=3840&q=100) Try Oppora AI Create Self-Running Agentic Sales Workflows like N8N just by chatting with AI [Get Started for FREE](https://app.oppora.ai) # Scrolling through hundreds of Google Maps listings to find the right local leads? That gets old fast. Your sales team needs business names, phone numbers, and emails — not hours lost to copy-pasting. The right scraper can pull all of this for you in minutes, turning Google Maps into a real lead generation engine. In this guide, you'll learn: - Why businesses rely on Google Maps for local prospecting - The must-have features in a Google Maps lead scraper - A side-by-side comparison of the 10 best "
+    }
+  ],
+  "refusals": [
+    {
+      "page_url": "https://ccslearningacademy.com/top-web-scraping-tools",
+      "publisher": "ccslearningacademy.com",
+      "status": "rejected_verify",
+      "reject_reason": "vendor named is not one of the brands the engines named"
+    },
+    {
+      "page_url": "https://jobboardly.com/blog/job-board-scraping-complete-guide-2025",
+      "publisher": "jobboardly.com",
+      "status": "rejected_verify",
+      "reject_reason": "vendor named is not one of the brands the engines named"
+    },
+    {
+      "page_url": "https://aimultiple.com/facebook-scraping",
+      "publisher": "aimultiple.com",
+      "status": "rejected_duplicate_recipient",
+      "reject_reason": "sedat.dogan@aimultiple.com is already being written to about https://aimultiple.com/tiktok-scraping"
+    },
+    {
+      "page_url": "https://aimultiple.com/instagram-scraping",
+      "publisher": "aimultiple.com",
+      "status": "rejected_duplicate_recipient",
+      "reject_reason": "gulbahar.karatas@aimultiple.com is already being written to about https://aimultiple.com/serp-scraper-api"
+    },
+    {
+      "page_url": "https://designrush.com/agency/it-services/trends/serp-scraper-api",
+      "publisher": "designrush.com",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said bad and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://designrush.com/agency/it-services/trends/proxy-services-for-scraping",
+      "publisher": "designrush.com",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said bad and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://designrush.com/agency/it-services/trends/web-scraping-tools",
+      "publisher": "designrush.com",
+      "status": "rejected_email",
+      "reject_reason": "email.verify said bad and the domain is not catch-all"
+    },
+    {
+      "page_url": "https://nextgrowth.ai/dataforseo-alternatives",
+      "publisher": "nextgrowth.ai",
+      "status": "rejected_duplicate_recipient",
+      "reject_reason": "contact@nextgrowth.ai is already being written to about https://nextgrowth.ai/best-seo-api"
+    },
+    {
+      "page_url": "https://codeintechnology.com/blog/web-scraping-apis-2026-technical-comparison",
+      "publisher": "codeintechnology.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for codeintechnology.com"
+    },
+    {
+      "page_url": "https://aimultiple.com/real-estate-scraper",
+      "publisher": "aimultiple.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for aimultiple.com"
+    },
+    {
+      "page_url": "https://proxyway.com/best/facebook-scraping-tools",
+      "publisher": "proxyway.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for proxyway.com"
+    },
+    {
+      "page_url": "https://signado.io/blog/linkedin-scraping-tools",
+      "publisher": "signado.io",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for signado.io"
+    },
+    {
+      "page_url": "https://smacient.com/best-instagram-scrapers-for-marketers",
+      "publisher": "smacient.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for smacient.com"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/web-scraping-pricing-guide-all-platforms",
+      "publisher": "use-apify.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for use-apify.com"
+    },
+    {
+      "page_url": "https://onrec.com/news/6-ahrefs-api-alternatives-in-2026-you-must-know",
+      "publisher": "onrec.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for onrec.com"
+    },
+    {
+      "page_url": "https://seobotai.com/blog/ahrefs-api-alternatives",
+      "publisher": "seobotai.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for seobotai.com"
+    },
+    {
+      "page_url": "https://techradar.com/reviews/bright-data",
+      "publisher": "techradar.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for techradar.com"
+    },
+    {
+      "page_url": "https://adyouri.com/python-web-scraping-libraries",
+      "publisher": "adyouri.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for adyouri.com"
+    },
+    {
+      "page_url": "https://analytify.io/best-seo-api",
+      "publisher": "analytify.io",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for analytify.io"
+    },
+    {
+      "page_url": "https://brave.com/blog/search-api-growth",
+      "publisher": "brave.com",
+      "status": "no_contact",
+      "reject_reason": "no named editor is published for brave.com"
+    },
+    {
+      "page_url": "https://aimultiple.com/ai-web-scraper",
+      "publisher": "aimultiple.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://proxyway.com/best/instagram-scrapers",
+      "publisher": "proxyway.com",
+      "status": "no_contact",
+      "reject_reason": "no contact address found on the page or its contact pages"
+    },
+    {
+      "page_url": "https://aimultiple.com/indeed-scraper",
+      "publisher": "aimultiple.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://builtbyjoey.com/blog/apollo-io-alternatives-2026",
+      "publisher": "builtbyjoey.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://connectsafely.ai/articles/best-linkedin-scraping-tools-lead-generation-2026",
+      "publisher": "connectsafely.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://contentpowered.com/blog/alternatives-ahrefs-api",
+      "publisher": "contentpowered.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://devops.com/github-api-abuse-ghost-accounts-part-of-malicious-efforts-to-map-organizations",
+      "publisher": "devops.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://distribb.io/blog/ahrefs-api-alternatives",
+      "publisher": "distribb.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://eunit.me/blog/how-to-scrape-real-estate-data-from-zillow-in-2026-step-by-step-guide",
+      "publisher": "eunit.me",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://fahimai.com/ai-web-scraping-tools",
+      "publisher": "fahimai.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://about.fb.com/news/2021/04/how-we-combat-scraping",
+      "publisher": "fb.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://futuramo.com/blog/top-ahrefs-api-alternatives-2026",
+      "publisher": "futuramo.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://getgenesis.app/blog/email-enrichment-tools-comparison",
+      "publisher": "getgenesis.app",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "publisher": "github.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://docs.github.com/en/graphql/overview/rate-limits-and-query-limits-for-the-graphql-api",
+      "publisher": "github.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://instaloader.github.io/",
+      "publisher": "github.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://developers.google.com/maps/documentation/places/web-service/data-fields",
+      "publisher": "google.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://developers.google.com/maps/documentation/places/web-service/policies",
+      "publisher": "google.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://developers.google.com/custom-search/v1/overview",
+      "publisher": "google.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://groupbwt.com/blog/how-to-scrape-data-from-google-maps",
+      "publisher": "groupbwt.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://keyword.com/blog/ahrefs-api-alternatives",
+      "publisher": "keyword.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://keyword.com/blog/rank-tracker-api-use-cases-seo",
+      "publisher": "keyword.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://leadfeeder.com/blog/lead-generation/buy-email-lists",
+      "publisher": "leadfeeder.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://listicler.com/alternatives/apollo-alternatives-better-email-verification",
+      "publisher": "listicler.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://moderninbound.com/blog/bettercontact-vs-prospeo",
+      "publisher": "moderninbound.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://moesif.com/blog/api-analytics/product/Pricing-Strategies-for-APIs",
+      "publisher": "moesif.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://monday.com/blog/crm-and-sales/apollo-alternative",
+      "publisher": "monday.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://opsmatters.com/posts/best-instagram-downloaders-2026-complete-comparison-guide",
+      "publisher": "opsmatters.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://outrank.so/blog/check-your-keyword-position-using-google-api",
+      "publisher": "outrank.so",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://plainenglish.io/web-scraping/how-to-scrape-data-from-google-jobs-listings-understanding-ip-bypass",
+      "publisher": "plainenglish.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://python.plainenglish.io/scrape-everythings-from-instagram-using-python-39b5a8baf2e5",
+      "publisher": "plainenglish.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://proxyway.com/best/best-zillow-scrapers",
+      "publisher": "proxyway.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://reactin.io/blog/top-linkedin-scraping-tools-2026",
+      "publisher": "reactin.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://praw.readthedocs.io/",
+      "publisher": "readthedocs.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://scrapeway.com/targets/indeed",
+      "publisher": "scrapeway.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://seozilla.ai/ahrefs-api-alternatives-in-2026",
+      "publisher": "seozilla.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://serpclix.com/blog/buy-bulk-website-traffic",
+      "publisher": "serpclix.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://similar.ai/guides/google-search-console-api",
+      "publisher": "similar.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://simular.ai/use-cases/subreddit-analyzer",
+      "publisher": "simular.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://skywork.ai/skypage/en/ai-engineer-private-web-search/1981557420757979136",
+      "publisher": "skywork.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://smashingmagazine.com/2025/09/serpapi-complete-api-fetching-search-engine-data",
+      "publisher": "smashingmagazine.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://sparkle.io/blog/apollo-io-alternatives",
+      "publisher": "sparkle.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://sparkle.io/blog/hunter-io-alternatives",
+      "publisher": "sparkle.io",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://stackademic.com/blog/6-best-dataforseo-competitors-for-seo-experts-2026",
+      "publisher": "stackademic.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://startuphub.ai/ai-news/ai-tools/1970/best-apollo-io-alternatives-email-finder",
+      "publisher": "startuphub.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://startuphub.ai/ai-news/ai-tools/2026/best-apollo-io-alternatives-email-finder",
+      "publisher": "startuphub.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://buildtolaunch.substack.com/p/apify-mcp-pay-per-result-guide",
+      "publisher": "substack.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://techradar.com/best/proxy",
+      "publisher": "techradar.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://tendem.ai/blog/scrape-google-maps-guide",
+      "publisher": "tendem.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://thatmarketingbuddy.com/best/seo-apis",
+      "publisher": "thatmarketingbuddy.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://thedigitalmerchant.com/best-proxy-scraper-services",
+      "publisher": "thedigitalmerchant.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://trysight.ai/blog/google-ranking-checker-api",
+      "publisher": "trysight.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://unipile.com/social-media-api",
+      "publisher": "unipile.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://developer.unipile.com/v2.0/docs/list-provider-features",
+      "publisher": "unipile.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://use-apify.com/blog/apify-instagram-scrapers-collections-2026",
+      "publisher": "use-apify.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://use-apify.com/docs/best-apify-actors/best-instagram-scrapers",
+      "publisher": "use-apify.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://wandb.ai/byyoung3/Generative-AI/reports/Sentiment-classification-with-the-Reddit-Praw-API-and-GPT-4o-mini--VmlldzoxMjEwODE3Nw",
+      "publisher": "wandb.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://withtool.dev/posts/ahrefs-api-alternatives",
+      "publisher": "withtool.dev",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://xda-developers.com/i-use-my-local-llms-with-these-6-obscure-self-hosted-apps",
+      "publisher": "xda-developers.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://zapier.com/blog/ahrefs-alternatives",
+      "publisher": "zapier.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://zenvanriel.com/ai-engineer-blog/perplexica-vs-searxng-self-hosted-search",
+      "publisher": "zenvanriel.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://aimultiple.com/scraping-browser",
+      "publisher": "aimultiple.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://cubecreative.design/blog/partners/best-ahrefs-api-alternatives-review-of-data-api-options-2696",
+      "publisher": "cubecreative.design",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://gumloop.com/blog/apify-alternatives",
+      "publisher": "gumloop.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 1 named vendor on the page"
+    },
+    {
+      "page_url": "https://mashvisor.com/blog/best-real-estate-data-api-comparison",
+      "publisher": "mashvisor.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://rb2b.com/learn/apollo-alternative",
+      "publisher": "rb2b.com",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    },
+    {
+      "page_url": "https://simular.ai/alternatives/subreddit-analyzer",
+      "publisher": "simular.ai",
+      "status": "rejected_not_roundup",
+      "reject_reason": "only 0 named vendor on the page"
+    }
+  ]
+}
