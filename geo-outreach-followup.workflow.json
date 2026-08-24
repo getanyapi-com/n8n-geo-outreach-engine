@@ -423,13 +423,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -960,
+        -660,
         -740
       ],
       "parameters": {
         "content": "## One daily pass answers sent, replied and due\nThere is no reply watcher and no sender in this package. `thread:get` returns every message in the thread, so one read tells you whether you pressed send, whether somebody wrote back, and whether a follow-up is due.\n\nA Gmail trigger cannot do this job: above typeVersion 1.2 it discards messages carrying the SENT label unless they also carry INBOX, so it cannot see you sending.\n\nAn unsent draft still sitting in the thread carries the DRAFT label, so \"you have not sent yet\" and \"a follow-up is already waiting\" are the same check, and neither one drafts anything new.",
         "color": 6,
-        "width": 3940,
+        "width": 3640,
         "height": 1460
       }
     }

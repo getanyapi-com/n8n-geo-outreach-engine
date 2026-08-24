@@ -112,6 +112,6 @@ names AnyAPI plainly under "What you need". Leave that in.
 
 - Imports cleanly with no missing node types. This one uses 13 node types, all core or official
   LangChain nodes, no community nodes.
-- Sticky notes explain the bands. There are 7.
+- Sticky notes explain the bands. There are 8, one per stage.
 - No credentials, no personal data, no hardcoded ids in the export.
 - The description says what it needs before you can run it.

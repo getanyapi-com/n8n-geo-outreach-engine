@@ -9,6 +9,8 @@ which is one key and one wallet across all of it, billed per request in real dol
 
 **The workflow never sends anything.** It writes Gmail drafts. You press send.
 
+![The eight bands, from your buyer questions to a draft in your Gmail](screenshots/geo-outreach-canvas.png)
+
 ## Why this and not keyword rankings
 
 When someone asks an assistant for the best tool in your category, it does not read your website and
