@@ -85,17 +85,22 @@ Here is one of the seventeen drafts, exactly as the workflow composed it:
 
 ```
 To: folks@folk.app
-Subject: AnyAPI for your 13 Best LinkedIn Data Scrapers list
+Subject: Collaboration between Folk and AnyAPI
 
 Hi Simo,
-
-You detail extracting profile data from Sales Navigator lists and Chrome extensions, but don't
-cover API options that fit B2B lead enrichment without subscriptions.
 
 I'm Kevin Wang from AnyAPI, access 327 scraping and data APIs behind one key with automatic
 failover and pay-per-request billing from a prepaid USD wallet with no subscription or idle fees.
 
-Would you consider adding AnyAPI to "13 Best LinkedIn Data Scrapers (2026 List)"?
+I came across your article "13 Best LinkedIn Data Scrapers (2026 List)" and thought AnyAPI could
+be a relevant addition for your readers - you detail extracting profile data from Sales Navigator
+lists and Chrome extensions but don't cover API options that fit B2B lead enrichment without
+subscriptions.
+
+We're looking to build more long-term partnerships in the space, and in return we'd be happy to
+feature Folk on our side where it makes sense.
+
+Would this be something your team is open to exploring?
 
 Best,
 Kevin Wang
@@ -103,15 +108,22 @@ Founder @ AnyAPI
 https://getanyapi.com
 ```
 
-The first sentence after the greeting is the only one about them, and it comes first on purpose. That shape is deliberate and it is the part that changed
+The subject is a collaboration between two companies rather than a product aimed at a page,
+because an editor can say yes to a conversation and cannot say yes to a submission. That shape is deliberate and it is the part that changed
 most. An earlier version quoted a sentence from the page back at its own editor, which reads
 exactly like what it was: a scraper had been there. The quote is still required and still checked
 character for character against the page, because it is the proof the writer read the piece rather
 than guessing from the title. It just belongs in the workbook, where you can check it, rather than
 in the email, where the recipient already knows what their page says.
 
-The model writes two things: the subject, and the sentence about their page. Everything else -
-greeting, the line about who you are, the offer back, the ask, the signature - is placed by code. That split exists because three consecutive runs each lost every draft to a
+The model writes exactly one thing: the clause after the dash, saying why this page's readers
+would want what you sell. Everything else - subject, greeting, the line about who you are, the
+opener, the offer back, the closing question, the signature - is placed by code.
+
+The greeting, the opener, the "thought/figured" verb and the fit clause each pick from a short list
+of wordings, so a run of forty emails is not forty byte-identical bodies. The pick is seeded from
+the page rather than random, so re-running a prospect produces the same email instead of a second,
+differently-worded one landing beside the first. That split exists because three consecutive runs each lost every draft to a
 different forgotten part.
 
 The line about who you are is the first sentence of the value proposition you typed on the form,

@@ -220,10 +220,19 @@ to. Nothing connected them. On the first real run they were different accounts: 
 inbox, and the email describing them in another. The form no longer asks. A free Gmail profile read
 supplies the address, so the summary always arrives where the drafts are.
 
-**An email that asks for nothing gets nothing.** The first assembled drafts opened with thirty-three
-words of the sender's own product copy and closed with "Would this be something you would be open
-to?" - a question with no antecedent, because no sentence above it had asked for anything. The
-reader's page now comes first and the closing line names both the ask and the page.
+**The template is copied, not derived.** The email shape here is taken from a working backlink
+outreach product's own template editor, field for field: a "Collaboration between <their company>
+and <your brand>" subject, the sender's line first, the page named in the second sentence, an offer
+back, and a soft "would this be something your team is open to exploring?" close. I had already
+rewritten this shape once from my own reasoning - reader's sentence first, an explicit "would you
+consider adding X to Y" - and shipped it. It was worse, and it was worse in the two places the real
+template is most deliberate. The subject now reads as one business writing to another rather than a
+submission to a page, and the close asks for a conversation rather than for the link itself.
+
+Four parts of the wording vary per recipient - greeting, opener, "thought" against "figured", and
+the fit clause - because a run of identical bodies is what a spam filter clusters on. The choice is
+seeded from the page rather than random, so re-running a prospect produces the same email rather
+than a second, differently-worded one arriving beside the first.
 
 ## The honest limits of this proof
 
