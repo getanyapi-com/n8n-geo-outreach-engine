@@ -138,12 +138,52 @@ for (const { file, wf } of workflows) {
 }
 if (draftsOnly) pass('no Gmail node in the package can send an email to a prospect');
 
+// ------------------------------------- 3b. the summary goes to the inbox that holds the drafts
+// The drafts are created in whichever account the Gmail credential belongs to, so that account is
+// the only place they can be read from. It used to be an unrelated address typed on the form, and on
+// the first real run the two were different accounts: eleven drafts in one inbox, the email
+// describing them in another. Two independent values with no mechanism making them agree will
+// disagree, so the form no longer asks.
+{
+  let sameInbox = true;
+  for (const { file, wf } of workflows) {
+    const form = wf.nodes.find((n) => n.type === 'n8n-nodes-base.formTrigger');
+    if (!form) continue;
+    const fields = form.parameters.formFields?.values || [];
+    const asks = fields.filter((f) => f.fieldType === 'email' || /email/i.test(f.fieldName || ''));
+    if (asks.length) {
+      fail(file + ' / the form asks for an email address: ' + asks.map((f) => f.fieldName).join(', '));
+      sameInbox = false;
+    }
+    const normalize = wf.nodes.find((n) => n.name === 'Normalize Onboarding Input');
+    if (normalize && normalize.parameters.jsCode.indexOf("$('Read Your Connected Inbox')") === -1) {
+      fail(file + ' / Normalize Onboarding Input does not take the recipient from the connected inbox');
+      sameInbox = false;
+    }
+  }
+  if (sameInbox) pass('the summary is emailed to the connected Gmail account, never to a typed-in address');
+}
+
 // ---------------------------------------------------------------- 4. paid calls are guarded
 const N8N_DEFAULT_TIMEOUT_MS = 10000;
 let guarded = true;
 for (const { file, wf } of workflows) {
   for (const node of wf.nodes.filter((n) => n.type === 'n8n-nodes-base.httpRequest')) {
     const p = node.parameters;
+    // The one HTTP node in the package that is not a paid AnyAPI call: it asks Gmail which account
+    // the credential belongs to, so the summary is sent to the inbox that holds the drafts instead
+    // of to an address typed on a form beside it. Free, a GET, no body, so none of the paid-call
+    // guards below mean anything for it. It is exempted by name and then pinned, because "the URL
+    // is not an AnyAPI one" is also exactly what an unguarded call smuggled into this package would
+    // look like, and a blanket skip would wave that through.
+    if (node.name === 'Read Your Connected Inbox') {
+      const pinned = p.url === 'https://gmail.googleapis.com/gmail/v1/users/me/profile'
+        && p.method === 'GET' && p.nodeCredentialType === 'gmailOAuth2'
+        && p.authentication === 'predefinedCredentialType' && !p.sendBody
+        && Number(p.options?.timeout) > 0;
+      if (!pinned) { fail(file + ' / ' + node.name + ' is not the free Gmail profile read it is exempted as'); guarded = false; }
+      continue;
+    }
     if (!String(p.url).startsWith('https://api.getanyapi.com/v1/run/')) {
       fail(file + ' / ' + node.name + ' calls something other than AnyAPI'); guarded = false;
     }
@@ -174,6 +214,76 @@ for (const { file, wf } of workflows) {
   }
 }
 if (guarded) pass('every paid call carries an Idempotency-Key data field, a real timeout, and a readable status code');
+
+// ------------------------- 4c. no Code node reads $input straight out of a Data Table node
+// A Data Table insert returns the ROW IT WROTE, not the item it was handed, so a Code node reading
+// $input immediately downstream gets that row's columns instead of its own input. The first real
+// n8n run died on it: "Missing required field: Your website URL", because the form submission had
+// been replaced by a geo_runs row three nodes earlier.
+//
+// The proof harness cannot see this - it skips Data Table nodes, so $input still carries the
+// original item and every one of these reads looks correct. That is exactly why it is checked here
+// against the graph rather than by running.
+{
+  let reads = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const type = new Map(wf.nodes.map((n) => [n.name, n.type]));
+    const jsCode = new Map(wf.nodes.filter((n) => n.type === 'n8n-nodes-base.code').map((n) => [n.name, n.parameters.jsCode]));
+    const op = new Map(wf.nodes.map((n) => [n.name, n.parameters?.operation]));
+    const parents = new Map();
+    for (const [from, conns] of Object.entries(wf.connections)) {
+      for (const output of conns.main || []) {
+        for (const edge of output || []) {
+          if (!parents.has(edge.node)) parents.set(edge.node, []);
+          parents.get(edge.node).push(from);
+        }
+      }
+    }
+    for (const [name, code] of jsCode) {
+      // Only writes are the hazard. A `get` returns the rows you asked for, which is precisely what
+      // a downstream Code node wants; an insert or update returns the row it just wrote.
+      const fedByWrite = (parents.get(name) || []).some(
+        (p) => type.get(p) === 'n8n-nodes-base.dataTable' && op.get(p) !== 'get',
+      );
+      // Comments are stripped first: the note explaining this very rule contains the word it looks
+      // for, and a check that flags its own documentation is a check nobody will keep.
+      const live = code.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+      if (fedByWrite && /\$input\b/.test(live)) {
+        fail(file + ' / ' + name + ' reads $input directly after a Data Table write');
+        reads = false;
+      }
+    }
+  }
+  if (reads) pass('no Code node reads $input straight out of a Data Table write');
+}
+
+// --------------------- 4d. no Code node depends on a global the n8n sandbox does not provide
+// n8n Code nodes run in a task-runner sandbox, not in Node. `URL` is not defined there. Both of the
+// helpers that used `new URL` caught the ReferenceError and returned '', so every hostname came out
+// empty and the whole domain layer - brand, ownership, publisher, recipient - silently blanked.
+// Nothing failed loudly; the run just produced nothing, and the harness could not see it because
+// Node has URL as a global.
+const SANDBOX_MISSING = ['URL', 'URLSearchParams', 'fetch', 'require', 'process', '__dirname'];
+{
+  let sandboxed = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    for (const node of wf.nodes.filter((n) => n.type === 'n8n-nodes-base.code')) {
+      const live = node.parameters.jsCode
+        .replace(/\/\*[\s\S]*?\*\//g, ' ')
+        .replace(/^\s*\/\/.*$/gm, ' ')
+        .replace(/(['"`])(?:\\.|(?!\1).)*\1/g, ' ');
+      for (const g of SANDBOX_MISSING) {
+        if (new RegExp('(?<![\\w.$])' + g + '(?![\\w$])').test(live)) {
+          fail(file + ' / ' + node.name + ' uses `' + g + '`, which the n8n Code sandbox does not define');
+          sandboxed = false;
+        }
+      }
+    }
+  }
+  if (sandboxed) pass('no Code node depends on a global the n8n Code sandbox does not define');
+}
 
 // ------------------------------------------- 4b. the run record counts every paid node, by name
 // The reported spend sits next to the operator's ceiling, so a node missing from that list is money
@@ -425,9 +535,12 @@ if (gateHolds) pass('the pitch gate passes a clean draft, refuses a foreign bare
           value_prop: VP, page_title: 'The best scraping tools', author_first: 'Andrew',
           sender_role: 'Founder', brand_domain: 'getanyapi.com', reciprocity: '' },
         { relevance: 'you cover ten of them but not a per-request option', subject: 'AnyAPI for your piece' },
-      ).body.split('\\n')[2];`);
+      ).body.split('\\n').find((l) => l.startsWith("I'm "));`);
     // The first three are the exact value propositions behind the three drafts that shipped with a
     // truncated identity line. The fourth checks the other half: a second sentence is still dropped.
+    // Found by what the line is, not by where it sits. It used to be body line 2 and the skeleton was
+    // reordered to put the reader's sentence first, at which point the index silently pointed at a
+    // different sentence and the check went on passing against the wrong string.
     const props = [
       'Access 327 social, search and enrichment APIs through one key with automatic provider failover and pay-per-request billing from a prepaid USD wallet.',
       'One API key provides pay-per-request access to hundreds of data APIs with automatic failover, eliminating idle costs and subscription lock-in for teams.',

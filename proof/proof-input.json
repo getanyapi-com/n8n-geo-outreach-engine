@@ -7,7 +7,7 @@
   "country": "US",
   "sender_name": "Kevin Wang",
   "sender_role": "Founder",
-  "results_email": "support@getanyapi.com",
+  "connected_inbox": "support@getanyapi.com",
   "spend_ceiling_usd": 2,
   "followup_gap_days": 5,
   "max_followups": 1,

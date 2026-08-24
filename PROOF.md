@@ -13,7 +13,12 @@ script that agrees with it.
 
 Two things the harness does not do, and both matter when reading the table.
 
-- **Data Table nodes are skipped.** State persistence changes no published number.
+- **Data Table nodes are skipped.** This was published as "state persistence changes no published
+  number", and that was wrong. A Data Table insert returns the row it wrote, not the item it was
+  given, so any Code node reading `$input` straight after one gets the row instead of its data. The
+  harness never saw it, because with the node skipped `$input` still carried the original item. Real
+  n8n killed the first execution on it. Three nodes now read past the write by name, and `npm run
+  verify` refuses the pattern outright.
 - **`draft:create` was not called.** Gmail needs an interactive OAuth consent that a headless run
   cannot give. Every pitch that passed the gate was written to `proof/artifacts-pro/drafts` exactly
   as the node would have sent it, which is why the funnel below stops at "passed every gate" and
@@ -200,6 +205,25 @@ leave its idempotency key held, so re-running the identical body under the same 
 replay window returns `409 idempotency_in_progress` rather than retrying the work. And
 `email_finding.hunter_domain` bills per contact returned and nothing at all when it finds nobody,
 which is why it is worth trying as the last rung even after `email.find` has come up empty.
+
+**A green harness is not a green run.** Twelve clean harness runs shipped a workflow that could
+not have worked for anybody. `new URL(...)` throws `ReferenceError` inside n8n's Code node sandbox,
+where `URL` is not a global; both callers caught it and returned an empty string, so every hostname
+in the run silently came back blank - the brand domain, every page domain, the ownership filter, the
+publisher filter and the recipient check. Node has `URL` as a global, so the harness was structurally
+incapable of noticing. The helpers parse by hand now, and the verifier fails on any Code node
+referencing a global the sandbox does not define.
+
+**Two addresses that nothing keeps in step will drift apart.** The summary was emailed to an address
+typed on the form, while the drafts were created in whichever account the Gmail credential belonged
+to. Nothing connected them. On the first real run they were different accounts: eleven drafts in one
+inbox, and the email describing them in another. The form no longer asks. A free Gmail profile read
+supplies the address, so the summary always arrives where the drafts are.
+
+**An email that asks for nothing gets nothing.** The first assembled drafts opened with thirty-three
+words of the sender's own product copy and closed with "Would this be something you would be open
+to?" - a question with no antecedent, because no sentence above it had asked for anything. The
+reader's page now comes first and the closing line names both the ask and the page.
 
 ## The honest limits of this proof
 

@@ -89,15 +89,13 @@ Subject: AnyAPI for your 13 Best LinkedIn Data Scrapers list
 
 Hi Simo,
 
+You detail extracting profile data from Sales Navigator lists and Chrome extensions, but don't
+cover API options that fit B2B lead enrichment without subscriptions.
+
 I'm Kevin Wang from AnyAPI, access 327 scraping and data APIs behind one key with automatic
 failover and pay-per-request billing from a prepaid USD wallet with no subscription or idle fees.
 
-I came across your piece "13 Best LinkedIn Data Scrapers (2026 List)" and thought AnyAPI could
-be a relevant addition for your readers - you detail extracting profile data from Sales
-Navigator lists and Chrome extensions but don't cover API options that fit B2B lead enrichment
-without subscriptions.
-
-Would this be something you would be open to?
+Would you consider adding AnyAPI to "13 Best LinkedIn Data Scrapers (2026 List)"?
 
 Best,
 Kevin Wang
@@ -105,16 +103,15 @@ Founder @ AnyAPI
 https://getanyapi.com
 ```
 
-Six lines, one of which is about them. That shape is deliberate and it is the part that changed
+The first sentence after the greeting is the only one about them, and it comes first on purpose. That shape is deliberate and it is the part that changed
 most. An earlier version quoted a sentence from the page back at its own editor, which reads
 exactly like what it was: a scraper had been there. The quote is still required and still checked
 character for character against the page, because it is the proof the writer read the piece rather
 than guessing from the title. It just belongs in the workbook, where you can check it, rather than
 in the email, where the recipient already knows what their page says.
 
-The model writes two things: the subject, and the one clause after the dash. Everything else -
-greeting, the line about who you are, the offer back, the closing question, the signature - is
-placed by code. That split exists because three consecutive runs each lost every draft to a
+The model writes two things: the subject, and the sentence about their page. Everything else -
+greeting, the line about who you are, the offer back, the ask, the signature - is placed by code. That split exists because three consecutive runs each lost every draft to a
 different forgotten part.
 
 The line about who you are is the first sentence of the value proposition you typed on the form,
@@ -220,7 +217,12 @@ thread with no reply and the gap elapsed gets a threaded follow-up draft.
    `Bearer YOUR_ANYAPI_KEY`, and assign it to every HTTP Request node.
 4. Create the five Data Tables below, then replace every `YOUR_DATA_TABLE_ID` in the imported
    workflow with the matching table.
-5. Assign a Gmail OAuth2 credential to the draft nodes and to the summary node.
+5. Assign a Gmail OAuth2 credential to the draft nodes, the summary node, and **Read Your Connected
+   Inbox**. That last one asks Gmail which account the credential belongs to, so the summary is
+   emailed to the same inbox the drafts are written into. There is no "send results to" field on
+   the form on purpose: two addresses that nothing keeps in step will drift apart, and the first
+   real run proved it by putting eleven drafts in one account and the email describing them in
+   another.
 6. Assign an OpenRouter credential to the four model nodes.
 7. Run the form once. Read the drafts in Gmail before you send anything.
 

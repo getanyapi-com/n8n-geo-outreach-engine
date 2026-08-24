@@ -431,6 +431,11 @@ async function runChain(chainName, modelName, parserName, inputItems) {
   console.log('GEO Prospector (pro), executed from the shipped workflow JSON\n');
 
   console.log('Band 1 Onboard and profile');
+  // Both of these are read by name out of Normalize Onboarding Input, and neither is something the
+  // harness can execute: the form trigger has no submission here, and the Gmail profile lookup needs
+  // the Gmail credential. So both are seeded from the same fixture the run is driven by.
+  outputs.set('Start Your GEO Outreach', [{ json: FORM }]);
+  outputs.set('Read Your Connected Inbox', [{ json: { emailAddress: FORM.connected_inbox } }]);
   const config = runCode('Normalize Onboarding Input', [{ json: FORM }]);
   const siteScrape = await runHttp('AnyAPI Scrape Your Website', config);
   const readSite = runCode('Verify Your Website Was Read', siteScrape);
