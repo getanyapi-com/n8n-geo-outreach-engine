@@ -164,6 +164,29 @@ if (draftsOnly) pass('no Gmail node in the package can send an email to a prospe
   if (sameInbox) pass('the summary is emailed to the connected Gmail account, never to a typed-in address');
 }
 
+// ------------------------------------------------- 3c. no two nodes sit on the same coordinates
+// A layout-only property, and the only reader of the layout is a human opening the canvas, so
+// nothing else in this file would ever notice. Measured: 'Create Prospect Workbook' was pushed at
+// column 63 instead of 74 and landed exactly on top of 'Do We Have A Verified Contact?', which the
+// published screenshot rendered as one unreadable smear of two node labels. The workflow ran
+// correctly the whole time, which is precisely why it survived every other check here.
+{
+  let spread = true;
+  for (const { file, wf } of workflows) {
+    const seen = new Map();
+    for (const node of wf.nodes) {
+      if (node.type === 'n8n-nodes-base.stickyNote') continue;
+      const key = node.position.join(',');
+      if (seen.has(key)) {
+        fail(file + ' / ' + node.name + ' sits on top of ' + seen.get(key) + ' at ' + key);
+        spread = false;
+      }
+      seen.set(key, node.name);
+    }
+  }
+  if (spread) pass('no two nodes are stacked on the same canvas coordinates');
+}
+
 // ---------------------------------------------------------------- 4. paid calls are guarded
 const N8N_DEFAULT_TIMEOUT_MS = 10000;
 let guarded = true;
@@ -683,7 +706,7 @@ const ALLOWED = new Map([
   [146, 'calls that had completed cleanly earlier in that same run'],
   [11, 'minutes, rounded down from the measured wall time'],
   // The number of sites judged is the sum of the verdicts, which the record carries separately.
-  [184, 'sites judged, the sum of the two publisher verdicts'],
+  [184, 'sites judged in the harness run, the sum of its two publisher verdicts'],
   // Development measurements from the runs that found the defects PROOF.md describes.
   [207, 'domains judged in the run that tested keeping unclear verdicts'],
   [78, 'of those judged unclear, which is why that rule was reverted'],
@@ -705,6 +728,16 @@ const measuredNumbers = new Set();
   if (Array.isArray(v)) { v.forEach(collect); return; }
   if (v && typeof v === 'object') { Object.values(v).forEach(collect); }
 }(samples.map((s) => s.sample)));
+
+// The three runs of the shipped JSON inside real n8n feed the same set. They are not `samples`,
+// because the draft and funnel checks below read the harness sample's shape and these are run
+// records only - but every figure in the run table in PROOF.md has to come out of a run record all
+// the same, so editing one there fails here.
+(function collectRuns(v) {
+  if (typeof v === 'number') { measuredNumbers.add(v); return; }
+  if (Array.isArray(v)) { v.forEach(collectRuns); return; }
+  if (v && typeof v === 'object') { Object.values(v).forEach(collectRuns); }
+}(parse('samples', 'measured-runs-n8n.json')));
 
 // A node count quoted in the prose is measured too - off the file it describes.
 for (const file of FILES) {

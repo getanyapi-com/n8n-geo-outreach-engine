@@ -234,14 +234,31 @@ the fit clause - because a run of identical bodies is what a spam filter cluster
 seeded from the page rather than random, so re-running a prospect produces the same email rather
 than a second, differently-worded one arriving beside the first.
 
+## Three runs in real n8n
+
+The harness proves the numbers. These prove the workflow, because they are the shipped JSON executing
+inside `n8n 2.35.7` with real credentials, and every draft in the last column exists in a Gmail
+account. Nothing was sent in any of them.
+
+| Execution | Buyer questions | Citations | Pitchable | Sites judged | Drafts in Gmail | Cost | Runtime |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 6 | 17 | 414 | 299 | 128 | 11 | $0.43886 | 13m52s |
+| 12 | 16 | 358 | 265 | 113 | 8 | $0.50639 | 11m22s |
+| 13 | 17 | 410 | 276 | 116 | 10 | $0.50943 | 10m32s |
+
+The spread between them is the engines, not the workflow: the same site and the same form produced
+between 358 and 414 cited URLs across three runs an hour apart. Execution 13 is the one the
+screenshot is captioned from, and the one whose gate refused a draft - a pitch naming a vendor the
+engines had never named.
+
 ## The honest limits of this proof
 
 - The engines are not stable between runs. Runs against the same site produced between 108 and 503
   cited URLs and between 0 and 18 passing drafts. Treat any single run as one sample.
 - The number of buyer questions is not fixed. The same site produced between 15 and 17 across
   consecutive runs, and every downstream number moves with it.
-- No Gmail draft was created by this run, so "the draft lands in your Gmail" is verified against the
-  Gmail node's documented behaviour and its source code. There is no screenshot of my inbox here.
+- The funnel table above is the harness run, because that is the run with a saved artifact for every
+  page it looked at. It is not the only evidence any more: see the three real runs below.
 - A verified address means the mailbox accepts mail. It does not mean the person still works there.
 - The publisher filter is a judgement, and judgements are wrong sometimes. It is the reason the
   workbook records a verdict for every domain: you can see what it decided and why before you send.
