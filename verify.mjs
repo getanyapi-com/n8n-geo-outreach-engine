@@ -495,6 +495,57 @@ if (gateHolds) pass('the pitch gate passes a clean draft, refuses a foreign bare
   if (onePer) pass('one contact address receives one draft per run, keeping their highest-scoring page');
 }
 
+// ------------------------------- 7d-bis. the contact-page scrape asks once per URL, not once per prospect
+// Measured: one run built 44 contact-page calls carrying only 30 distinct idempotency keys, because
+// several prospects share a publisher and each independently asks for its /contact and /contact-us.
+// n8n fires a node's items concurrently, so the 14 duplicates raced and every loser came back
+// 409 idempotency_in_progress - a thrown-away contact page per loser, for a page we had already read.
+{
+  let deduped = true;
+  for (const file of FILES) {
+    const wf = parse('.', file);
+    const build = wf.nodes.find((n) => n.name === 'Build Contact Page Calls');
+    const extract = wf.nodes.find((n) => n.name === 'Extract Email From The Contact Page');
+    if (!build || !extract) continue;
+    const prospects = [
+      { json: { prospect_id: 'p1', run_id: 'r1', page_domain: 'a.example', cost_usd: 0, contact_source: '',
+                contact_candidates: ['https://a.example/contact', 'https://a.example/contact-us'] } },
+      // Same publisher, different page: must NOT re-ask for the same two URLs.
+      { json: { prospect_id: 'p2', run_id: 'r1', page_domain: 'a.example', cost_usd: 0, contact_source: '',
+                contact_candidates: ['https://a.example/contact', 'https://a.example/contact-us'] } },
+    ];
+    const calls = new Function('$input', '$', build.parameters.jsCode)(
+      { all: () => prospects, first: () => prospects[0] }, () => ({ first: () => ({ json: {} }), all: () => [] }));
+    const keys = calls.map((c) => c.json.scrapeIdem);
+    if (new Set(keys).size !== keys.length) {
+      fail(file + ' / Build Contact Page Calls emits ' + keys.length + ' calls with only ' +
+        new Set(keys).size + ' distinct idempotency keys; the duplicates race to a 409');
+      deduped = false;
+    }
+    // One scrape, one charge, and every prospect on that publisher gets the address it found.
+    const hit = [{ json: { statusCode: 200, body: { costUsd: 0.0007, output: { found: true,
+      data: { markdown: 'write to editor@a.example', rawHtml: '' } } } } }];
+    const rest = calls.slice(1).map(() => ({ json: { statusCode: 200, body: { costUsd: 0.0007,
+      output: { found: false, data: null } } } }));
+    const stubs = { 'Build Contact Page Calls': calls, 'Do We Need To Read A Contact Page?': prospects };
+    const out = new Function('$input', '$', extract.parameters.jsCode)(
+      { all: () => hit.concat(rest), first: () => hit[0] },
+      (ref) => ({ all: () => stubs[ref], first: () => stubs[ref][0] }));
+    const withEmail = out.filter((o) => o.json.contact_email === 'editor@a.example');
+    if (withEmail.length !== 2) {
+      fail(file + ' / a shared contact page reached ' + withEmail.length + ' of 2 prospects on that publisher');
+      deduped = false;
+    }
+    const charged = out.reduce((sum, o) => sum + Number(o.json.cost_usd || 0), 0);
+    if (Math.abs(charged - 0.0007 * calls.length) > 1e-9) {
+      fail(file + ' / the shared contact-page charge is counted ' + (charged / 0.0007).toFixed(2) +
+        ' times against the ceiling, not ' + calls.length);
+      deduped = false;
+    }
+  }
+  if (deduped) pass('the contact-page scrape asks once per URL and its result reaches every prospect on that publisher');
+}
+
 // --------------------------------------- 7e. no paid call is ever built without its request body
 // Measured: 43 of 61 calls to email_finding.hunter_domain came back
 // `invalid_input: missing property 'domain'`, because the node that built the bodies also decided
